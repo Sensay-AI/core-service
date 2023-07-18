@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
-
+from app.core.config import API_V1_STR
 from app.core import auth
 from app.routes import views
+from app.routes.api_v1 import api as api_v1
 
 app = FastAPI()
 
@@ -15,5 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+app.include_router(api_v1.router, prefix=API_V1_STR)
 app.include_router(auth.router)
 app.include_router(views.router)

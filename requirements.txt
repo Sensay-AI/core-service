@@ -51,5 +51,10 @@ typing-extensions==4.6.3
 uvicorn==0.22.0
     # via fastapi-nano (pyproject.toml)
 
+sqlalchemy==2.0.19
+
+psycopg2-binary==2.9.6
+
+
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
