@@ -5,62 +5,82 @@ from sqlalchemy.orm import Session
 from http import HTTPStatus
 from app.db.database import get_db
 from app.models.users import UserInfo
-from app.schemas.users import UserCreate
-from app.core.security import get_password_hash
+from app.schemas.users import UserUpdate, Auth0User
 from fastapi import APIRouter, Body, Depends, HTTPException
-from sqlalchemy import or_
+from app.core.auth0 import check_user
 
 router = APIRouter()
 
 
 @router.get("/")
-async def get_all_users(
+async def get_user_profile(
         *,
-        db: Session = Depends(get_db),
-        # auth: Depends = Depends(get_current_user),
-) -> dict[str, Any]:
-    users = db.query(UserInfo).all()
-    return {
-        "items": users
-    }
+        auth: Auth0User = Depends(check_user)
+):
+    return auth
 
 
-@router.post("/sign_up")
-async def create_user(
+@router.post("/create")
+async def create_user_profile(
         *,
-        user_input: UserCreate,
+        user_input: UserUpdate,
         db: Session = Depends(get_db),
-        # auth: Depends = Depends(get_current_user),
+        auth: Auth0User = Depends(check_user)
 ) -> dict[str, str]:
     user: Optional[UserInfo] = db.query(UserInfo).filter(
-        or_(UserInfo.email == user_input.email, UserInfo.phone_number == user_input.phone_number)
+        UserInfo.user_id == auth.id
     ).first()
 
     if user:
-        if user.phone_number:
-            raise HTTPException(
-                status_code=HTTPStatus.CONFLICT,
-                detail="The user with this phone number already exists in the system.",
-            )
-        if user.email:
-            raise HTTPException(
-                status_code=HTTPStatus.CONFLICT,
-                detail="The user with this email already exists in the system.",
-            )
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="The user already exists!",
+        )
 
-    user = UserInfo(
-        full_name=user_input.full_name,
-        email=user_input.email,
-        # password=get_password_hash(user_input.password),
-        password=user_input.password,
-        phone_number=user_input.phone_number,
-        dob=user_input.dob
-    )
-
+    user = UserInfo()
+    user.user_id = auth.id
+    user.full_name = user_input.full_name
+    user.email = user_input.email
+    user.country = user_input.country
+    user.language = user_input.language
+    user.phone_number = user_input.phone_number
+    user.nickname = user_input.nickname
+    user.dob = user_input.dob
     db.add(user)
     db.commit()
     db.refresh(user)
 
     return {
-        "message": "Create successfully!"
+        "message": "Create user successfully!"
+    }
+
+@router.put("/update")
+async def update_user_profile(
+        *,
+        user_input: UserUpdate,
+        db: Session = Depends(get_db),
+        auth: Auth0User = Depends(check_user)
+) -> dict[str, str]:
+    user: Optional[UserInfo] = db.query(UserInfo).filter(
+        UserInfo.user_id == auth.id
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="The user does not exists!",
+        )
+
+    user.full_name = user_input.full_name
+    user.email = user_input.email
+    user.country = user_input.country
+    user.language = user_input.language
+    user.phone_number = user_input.phone_number
+    user.nickname = user_input.nickname
+    user.dob = user_input.dob
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "message": "Update user successfully!"
     }

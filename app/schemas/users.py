@@ -1,11 +1,18 @@
-from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import date
+from typing import Optional, List
 
 
-class UserCreate(BaseModel):
-    full_name: str
-    email: str
-    password: str
-    phone_number: str
+class Auth0User(BaseModel):
+    id: str = Field(..., alias='sub')
+    permissions: Optional[List[str]]
+
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str]
+    email: Optional[str]
+    country: Optional[str]
+    language: Optional[str]
+    phone_number: Optional[str]
+    nickname: Optional[str]
     dob: Optional[date]

@@ -10,17 +10,20 @@ class Gender(enum.Enum):
 
 
 class UserInfo(Base):
-    __tablename__ = 'users_info'
+    __tablename__ = 'user_info'
     id = Column(Integer, primary_key=True)
+    user_id = Column(String, unique=true, nullable=false)
     full_name = Column(String, nullable=false)
+    nickname = Column(String)
     email = Column(String, nullable=false, unique=true)
-    password = Column(String, nullable=false)
     phone_number = Column(String(20), nullable=false, unique=true)
     gender = Column(Enum(Gender), default=Gender.other)
+    country = Column(String(20),default="VietNam")
+    language = Column(String(20),default="VietNam")
     dob = Column(Date)
+    picture = Column(String)
     created_at = Column(DateTime(timezone=true), server_default=func.now())
-    is_active = Column(Boolean(), default=True)
-    is_superuser = Column(Boolean(), default=False)
+    updated_at = Column(DateTime(timezone=true), server_default=func.now())
 
 
 
