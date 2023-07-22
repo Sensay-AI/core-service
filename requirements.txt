@@ -54,7 +54,7 @@ uvicorn==0.22.0
 sqlalchemy==2.0.19
 
 psycopg2-binary==2.9.6
-
+PyJWT==2.1.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
