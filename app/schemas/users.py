@@ -1,10 +1,11 @@
-from pydantic import BaseModel, Field
 from datetime import date
-from typing import Optional, List
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class Auth0User(BaseModel):
-    id: str = Field(..., alias='sub')
+    id: str = Field(..., alias="sub")
     permissions: Optional[List[str]]
 
 
@@ -15,4 +16,4 @@ class UserUpdate(BaseModel):
     language: Optional[str]
     phone_number: Optional[str]
     nickname: Optional[str]
-    dob: Optional[date]
+    date_of_birth: Optional[date]
