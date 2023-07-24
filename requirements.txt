@@ -4,7 +4,7 @@
 #
 #    pip-compile --no-emit-options --output-file=requirements.txt pyproject.toml
 #
-anyio==3.7.0
+anyio==3.7.1
     # via starlette
 bcrypt==4.0.1
     # via fastapi-nano (pyproject.toml)

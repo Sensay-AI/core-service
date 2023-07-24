@@ -4,7 +4,7 @@
 #
 #    pip-compile --extra=dev --no-emit-options --output-file=requirements-dev.txt pyproject.toml
 #
-anyio==3.7.0
+anyio==3.7.1
     # via
     #   httpcore
     #   starlette
