@@ -4,6 +4,7 @@ from typing import Any
 import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from singleton_decorator import singleton
 
 from app.core.config import API_AUDIENCE, AUTH0_ALGORITHMS, AUTH0_ISSUER, DOMAIN_AUTH0
 from app.schemas.users import Auth0User
@@ -12,11 +13,14 @@ from app.schemas.users import Auth0User
 async def check_user(
     token: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
 ) -> Auth0User:
-    return VerifyToken(token.credentials).verify()
+    return Auth0Helper(token.credentials).verify_token()
 
 
 def _check_claims(
-    payload: dict[str, Any], claim_name: str, claim_type: Any, expected_value: list[str]
+    payload: dict[str, Any],
+    claim_name: str,
+    claim_type: Any,
+    expected_value: list[str],
 ) -> None:
     instance_check = isinstance(payload[claim_name], claim_type)
 
@@ -40,28 +44,22 @@ def _check_claims(
             )
 
 
-class VerifyToken(object):
-    _instance = None
-
+@singleton
+class Auth0Helper(object):
     def __init__(
         self,
         token: str,
-        permissions: list[str] = [],
-        scopes: list[str] = [],
+        permissions: Any = None,
+        scopes: Any = None,
     ):
         self.signing_key = None
         self.token = token
-        self.permissions = permissions
-        self.scopes = scopes
+        self.permissions: list[str] = permissions
+        self.scopes: list[str] = scopes
         self.jwks_url = f"https://{DOMAIN_AUTH0}/.well-known/jwks.json"
         self.jwks_client = jwt.PyJWKClient(self.jwks_url)
 
-    def __new__(cls: Any, *args: Any, **kwargs: Any) -> Any:
-        if not hasattr(cls, "instance"):
-            cls._instance = super(VerifyToken, cls).__new__(cls)
-        return cls._instance
-
-    def verify(self) -> Auth0User:
+    def verify_token(self) -> Auth0User:
         try:
             self.signing_key = self.jwks_client.get_signing_key_from_jwt(self.token).key
         except jwt.exceptions.PyJWKClientError as error:
@@ -89,13 +87,12 @@ class VerifyToken(object):
                 detail=str(e),
             )
 
-        if len(self.scopes) != 0:
+        if self.scopes:
             _check_claims(payload, "scope", str, self.scopes)
 
-        if len(self.permissions) != 0:
+        if self.permissions:
             _check_claims(payload, "permissions", list, self.permissions)
 
         user = Auth0User(**payload)
         user.permissions = payload["scope"].split(" ")
-
         return user

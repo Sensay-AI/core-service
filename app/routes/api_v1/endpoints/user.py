@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from http import HTTPStatus
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
@@ -16,8 +16,19 @@ router = APIRouter()
 
 
 @router.get("/")
-async def get_user_profile(*, auth: Auth0User = Depends(check_user)) -> Auth0User:
-    return auth
+async def get_user_profile(
+    *, db: Session = Depends(get_db), auth: Auth0User = Depends(check_user)
+) -> dict[str, Any]:
+    user: Optional[UserInfo] = (
+        db.query(UserInfo).filter(UserInfo.user_id == auth.id).first()
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="The user does not exists!",
+        )
+    return user.__dict__
 
 
 @router.post("/create")
@@ -81,9 +92,11 @@ async def update_user_profile(
         user.phone_number = user_input.phone_number
         user.nickname = user_input.nickname
         user.date_of_birth = user_input.date_of_birth
+
         db.commit()
         db.refresh(user)
         return {"message": "Update user successfully!"}
+
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(
