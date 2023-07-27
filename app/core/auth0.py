@@ -10,16 +10,16 @@ from app.schemas.users import Auth0User
 
 
 async def check_user(
-        token: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
+    token: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
 ) -> Auth0User:
     return Auth0Helper.verify_token(token.credentials)
 
 
 def _check_claims(
-        payload: dict[str, Any],
-        claim_name: str,
-        claim_type: Any,
-        expected_value: list[str],
+    payload: dict[str, Any],
+    claim_name: str,
+    claim_type: Any,
+    expected_value: list[str],
 ) -> None:
     instance_check = isinstance(payload[claim_name], claim_type)
 
@@ -39,21 +39,22 @@ def _check_claims(
             raise HTTPException(
                 status_code=HTTPStatus.FORBIDDEN,
                 detail=f"Insufficient {claim_name} ({value}). You "
-                       "don't have access to this resource",
+                "don't have access to this resource",
             )
 
 
 class Auth0Helper(object):
+    _jwks_url = f"https://{DOMAIN_AUTH0}/.well-known/jwks.json"
+    _jwks_client = jwt.PyJWKClient(_jwks_url)
+
     @staticmethod
     def verify_token(
-            token: str,
-            permissions: Any = None,
-            scopes: Any = None,
+        token: str,
+        permissions: Any = None,
+        scopes: Any = None,
     ) -> Auth0User:
-        jwks_url = f"https://{DOMAIN_AUTH0}/.well-known/jwks.json"
-        jwks_client = jwt.PyJWKClient(jwks_url)
         try:
-            signing_key = jwks_client.get_signing_key_from_jwt(token).key
+            signing_key = Auth0Helper._jwks_client.get_signing_key_from_jwt(token).key
         except jwt.exceptions.PyJWKClientError as error:
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,

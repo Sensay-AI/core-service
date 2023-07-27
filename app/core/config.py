@@ -24,3 +24,9 @@ AUTH0_ISSUER = config("AUTH0_ISSUER", str)
 AUTH0_ALGORITHMS = config("AUTH0_ALGORITHMS", str)
 # ------------------
 POSTGRESQL_URI = config("POSTGRESQL_URI", str)
+
+# Testing--------------
+AUTH_TEST_CLIENT_ID = "gJXFX5OnAeozyav7iwYtd5MFGV59YZ5T"
+AUTH_TEST_CLIENT_SECRET = (
+    "U51UoRGWPnBHOtL2LCdlGG9PDwFa8jiSQ1DmBZDqvItIuJrZK7KOzMVgKkmepsSl"
+)

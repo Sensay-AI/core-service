@@ -57,7 +57,9 @@ psycopg2-binary==2.9.6
 PyJWT==2.1.0
 singleton-decorator==1.0.0
 pytest==7.3.2
+requests==2.31.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+
 
