@@ -30,12 +30,14 @@ from app.db.database import Base, init_db
 
 from pydantic import BaseModel, Field
 
+
 SUPPORTED_LANGUAGES = config.SUPPORTED_LANGUAGES.split(',')
+
 
 def validate_language_in_list(language: str) -> str:
     if language.lower() not in SUPPORTED_LANGUAGES:
-        raise ValueError(f"Unsupported language. Available languages: {', '.join(SUPPORTED_LANGUAGES)}")
->>>>>>> 90f0aa9 (implemen image captioning SAI-27)
+        raise ValueError(f"Unsupported language. \
+                         Available languages: {', '.join(SUPPORTED_LANGUAGES)}")
     return language
 
 
@@ -52,30 +54,9 @@ class Language(StrEnum):
 
 class ImageCaptionRequest(BaseModel):
     user_id: str = Field(
-<<<<<<< HEAD
-        default="", description="user id for saving history for further analysis"
-    )
-    image_url: str = Field(description="image url to generation captions from")
-    language: str = Field(description="languages to generate caption in")
-
-    @validator("language")
-    def validate_language(cls, language: str) -> str:
-        return validate_language_in_list(language)
-
-
-class ImageCaption(Base):
-    __tablename__ = "image_caption"
-    id = Column(Integer, primary_key=True)
-    user_id = Column(String, ForeignKey("user_info.user_id"), nullable=False)
-    image_url = Column(Integer)
-    caption = Column(String)
-    language = Column(String)
-    time_created = Column(DateTime(), server_default=func.now())
-    time_updated = Column(DateTime(), server_default=func.now())
-=======
-        default="", 
+        default="",
         description="user id for saving history for further analysis"
-    )   
+    )
     image_url: str = Field(description="image url to generation captions from")
     language: constr(strip_whitespace=True)
     @validator('language')
@@ -88,6 +69,3 @@ class UserImage(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(String, unique=True, nullable=False)
     captioned_images = Column(MutableList.as_mutable(ARRAY(JSONB)))
-
-init_db()
->>>>>>> 90f0aa9 (implemen image captioning SAI-27)

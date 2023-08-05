@@ -29,7 +29,7 @@ from app.models.image_caption import ImageCaptionRequest, UserImage
 from app.db.database import get_db
 from app.aws.s3 import S3Image
 from app.core import config
-from app.captions.replicate_caption import CaptionGenerator 
+from app.captions.replicate_caption import CaptionGenerator
 from app.chatgpt.chatgpt_requests import rewrite_caption_in_language
 
 router = APIRouter()
@@ -64,7 +64,7 @@ def generate_caption(
     user_id = input_data.user_id
     language = input_data.language
     image_url = input_data.image_url
-    image_file = s3Client.get_file(file_path=image_url, 
+    image_file = s3Client.get_file(file_path=image_url,
                                    bucket_name=config.S3_IMAGE_BUCKET
                                    )
     if image_file is not None:
@@ -105,11 +105,11 @@ def generate_caption(
     )
     if caption is None:
         raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR, 
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="Error generating caption"
         )
     rewritten_caption = rewrite_caption_in_language(
-        caption=caption, 
+        caption=caption,
         language=language
     )
     if rewritten_caption is None:
