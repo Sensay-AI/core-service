@@ -1,5 +1,6 @@
-import openai
 import json
+
+import openai
 
 from app.core import config
 from app.utils.utils import logger
@@ -17,7 +18,7 @@ def rewrite_caption_in_language(caption, language):
             messages=[{"role": "user", "content": prompt}],
         )
         response_message = response["choices"][0]["message"]["content"]
-    except Exception as e:
-        logger.error(f"Chatgpt Error {e}", exc_info=True)
+    except Exception as error:
+        logger.error(f"Chatgpt Error {error}", exc_info=True)
         return None
     return response_message
