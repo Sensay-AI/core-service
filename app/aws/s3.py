@@ -16,15 +16,19 @@ class S3Image:
             region_name=config.AWS_REGION
         )
         self.hash_algo = hashlib.sha256()
-    
-    def check_file_exists(self, bucket_name: str, file_path=str):
+
+    def check_file_exists(self, bucket_name: str, file_path=str) -> str:
         try:
             self.s3_client.head_object(Bucket=bucket_name, Key=file_path)
             return file_path
-        except:
+        except (Exception,):
             return None
 
-    def upload_file(self, file: BytesIO, user_id: str, bucket_name: str):
+    def upload_file(self,
+                    file: BytesIO,
+                    user_id: str,
+                    bucket_name: str
+                    ) -> str:
         hashed_name = hashlib.sha256(file.read()).hexdigest()
         upload_path = f"user/{user_id}/{hashed_name}.jpg"
         path = self.check_file_exists(bucket_name, upload_path)
@@ -41,11 +45,3 @@ class S3Image:
         except Exception as e:
             logger.error(e, exc_info=True)
             return None
-
-    def get_file(self, file_path: str, bucket_name: str):
-        try:
-            obj = self.s3_client.get_object(Bucket=bucket_name, Key=file_path)
-        except Exception as e:
-            logger.error(e, exc_info=True)
-            return None
-        return obj
