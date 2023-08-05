@@ -1,7 +1,8 @@
+import hashlib
 from io import BytesIO
 
 import boto3
-import hashlib
+import botocore
 
 from app.core import config
 from app.utils.utils import logger
@@ -21,7 +22,7 @@ class S3Image:
         try:
             self.s3_client.head_object(Bucket=bucket_name, Key=file_path)
             return file_path
-        except (Exception,):
+        except botocore.exceptions.ClientError:
             return None
 
     def upload_file(self,
@@ -42,6 +43,6 @@ class S3Image:
                 Key=upload_path,
             )
             return upload_path
-        except Exception as e:
-            logger.error(e, exc_info=True)
+        except Exception as error:
+            logger.error(error, exc_info=True)
             return None

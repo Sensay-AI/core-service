@@ -31,7 +31,6 @@ AWS_ACCESS_KEY = config("AWS_ACCESS_KEY", str)
 AWS_SECRET_KEY = config("AWS_SECRET_KEY", str)
 AWS_REGION = config("AWS_REGION", str)
 
-
 # Testing--------------
 AUTH_TEST_CLIENT_ID = "gJXFX5OnAeozyav7iwYtd5MFGV59YZ5T"
 AUTH_TEST_CLIENT_SECRET = (
