@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import datetime
 from http import HTTPStatus
 from typing import Any
 
@@ -15,11 +16,7 @@ LOG = logging.getLogger(__name__)
 
 @singleton
 class ChatGPTVocabularyGenerator(object):
-    _model = OpenAI(
-        openai_api_key=OPEN_API_KEY,
-        max_tokens=-1,
-        temperature=0.5,
-    )
+    _model = OpenAI(openai_api_key=OPEN_API_KEY, max_tokens=-1, temperature=0.5)
 
     _vocabulary_format = """{
                 "lesson": <prompt of lesson>,
@@ -36,13 +33,11 @@ class ChatGPTVocabularyGenerator(object):
             to learn {{ learning_language }} in multiple-choice format with {{ num_answers }} answers, 
             display the answer for each question  and translate to {{ primary_language }}
             Do not include any explanations, only provide a RFC8259 compliant JSON response following 
-            this format without deviation.
-            [
-                {
+            this format without deviation:
+            {
                     "{{ learning_language }}": {{ format_output }},
                     "{{ primary_language }}": {{ format_output }}
-                }
-            ] 
+            }
         """
 
     def __int__(self) -> Any:
@@ -57,6 +52,7 @@ class ChatGPTVocabularyGenerator(object):
         num_answers: int = 5,
     ) -> dict[str, Any]:
         try:
+            start = datetime.now()
             prompt_template: PromptTemplate = PromptTemplate.from_template(
                 self._vocabulary_template, template_format="jinja2"
             )
@@ -72,6 +68,8 @@ class ChatGPTVocabularyGenerator(object):
             LOG.debug(f"[Vocabulary] Prompt: {prompt}")
 
             response = self._model.predict(prompt)
+
+            LOG.debug(f"[Vocabulary] Execution time: {datetime.now() - start}")
 
             return json.loads(response)
 
