@@ -1,12 +1,14 @@
-from langchain.llms import OpenAI
-from app.core.config import OPEN_API_KEY
-from singleton_decorator import singleton
-from typing import Any
-from langchain import PromptTemplate
 import json
 import logging
-from fastapi import HTTPException
 from http import HTTPStatus
+from typing import Any
+
+from fastapi import HTTPException
+from langchain import PromptTemplate
+from langchain.llms import OpenAI
+from singleton_decorator import singleton
+
+from app.core.config import OPEN_API_KEY
 
 LOG = logging.getLogger(__name__)
 
@@ -43,21 +45,20 @@ class ChatGPTVocabularyGenerator(object):
             ] 
         """
 
-    def __int__(self):
+    def __int__(self) -> Any:
         pass
 
     def generateVocabularyQuestion(
-            self,
-            category: str,
-            primary_language: str,
-            learning_language: str,
-            num_questions: int,
-            num_answers: int
+        self,
+        category: str,
+        primary_language: str,
+        learning_language: str,
+        num_questions: int = 4,
+        num_answers: int = 5,
     ) -> dict[str, Any]:
         try:
             prompt_template: PromptTemplate = PromptTemplate.from_template(
-                self._vocabulary_template,
-                template_format="jinja2"
+                self._vocabulary_template, template_format="jinja2"
             )
 
             prompt = prompt_template.format(
@@ -66,7 +67,7 @@ class ChatGPTVocabularyGenerator(object):
                 learning_language=learning_language,
                 num_questions=num_questions,
                 num_answers=num_answers,
-                format_output=self._vocabulary_format
+                format_output=self._vocabulary_format,
             )
             LOG.debug(f"[Vocabulary] Prompt: {prompt}")
 
