@@ -7,6 +7,7 @@ BASE_DIR = ROOT.parent  # ./
 API_V1_STR = "/api/v1"
 config = Config(BASE_DIR / ".env")
 
+
 API_USERNAME = config("API_USERNAME", str)
 API_PASSWORD = config("API_PASSWORD", str)
 
@@ -30,3 +31,5 @@ AUTH_TEST_CLIENT_ID = "gJXFX5OnAeozyav7iwYtd5MFGV59YZ5T"
 AUTH_TEST_CLIENT_SECRET = (
     "U51UoRGWPnBHOtL2LCdlGG9PDwFa8jiSQ1DmBZDqvItIuJrZK7KOzMVgKkmepsSl"
 )
+
+OPEN_API_KEY = config("OPEN_API_KEY", str)
