@@ -35,8 +35,7 @@ async def upload_image_to_s3(
                                   )
     if result is not None:
         return {"upload path": result}
-    else:
-        raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            detail="We have an error uploading files"
-        )
+    raise HTTPException(
+        status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        detail="We have an error uploading files"
+    )
