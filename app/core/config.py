@@ -25,6 +25,13 @@ AUTH0_ALGORITHMS = config("AUTH0_ALGORITHMS", str)
 # ------------------
 POSTGRESQL_URI = config("POSTGRESQL_URI", str)
 
+# aws conf
+S3_IMAGE_BUCKET = config("S3_IMAGE_BUCKET", str, default='sensayai-images')
+AWS_ACCESS_KEY = config("AWS_ACCESS_KEY", str)
+AWS_SECRET_KEY = config("AWS_SECRET_KEY", str)
+AWS_REGION = config("AWS_REGION", str)
+
+
 # Testing--------------
 AUTH_TEST_CLIENT_ID = "gJXFX5OnAeozyav7iwYtd5MFGV59YZ5T"
 AUTH_TEST_CLIENT_SECRET = (
