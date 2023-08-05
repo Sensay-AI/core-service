@@ -5,8 +5,10 @@ from app.core import auth
 from app.core.config import API_V1_STR
 from app.routes import views
 from app.routes.api_v1 import api as api_v1
+from app.db.database import Base, engine
 
 app = FastAPI()
+Base.metadata.create_all(bind=engine)
 
 # Set all CORS enabled origins
 app.add_middleware(
