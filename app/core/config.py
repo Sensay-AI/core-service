@@ -28,6 +28,7 @@ AUTH0_ALGORITHMS = config("AUTH0_ALGORITHMS", str)
 POSTGRESQL_URI = config("POSTGRESQL_URI", str)
 
 # aws conf
+<<<<<<< HEAD
 S3_IMAGE_BUCKET = config("S3_IMAGE_BUCKET", str, default="sensayai-images")
 AWS_ACCESS_KEY = config("AWS_ACCESS_KEY", str, default="")
 AWS_SECRET_KEY = config("AWS_SECRET_KEY", str, default="")
@@ -39,6 +40,23 @@ OPENAI_API_KEY = config("OPENAI_API_KEY", str, default="")
 # caption model config
 IMAGE_CAPTIONING_MODEL = config("IMAGE_CAPTIONING_MODEL", str)
 REPLICATE_API_TOKEN = config("REPLICATE_API_TOKEN", str, default="")
+=======
+S3_IMAGE_BUCKET = config("S3_IMAGE_BUCKET", str, default='sensayai-images')
+AWS_ACCESS_KEY = config("AWS_ACCESS_KEY", str)
+AWS_SECRET_KEY = config("AWS_SECRET_KEY", str)
+AWS_REGION = config("AWS_REGION", str)
+
+# openai conf
+OPENAI_API_KEY = config("OPENAI_API_KEY", str)
+
+# caption model config
+IMAGE_CAPTIONING_MODEL = config("IMAGE_CAPTIONING_MODEL", str)
+REPLICATE_API_TOKEN = config("REPLICATE_API_TOKEN", str)
+
+# app langugages
+SUPPORTED_LANGUAGES = config("SUPPORTED_LANGUAGES", str)
+
+>>>>>>> 90f0aa9 (implemen image captioning SAI-27)
 
 # Testing--------------
 AUTH_TEST_CLIENT_ID = "gJXFX5OnAeozyav7iwYtd5MFGV59YZ5T"
