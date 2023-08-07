@@ -8,6 +8,7 @@ from app.main import app
 
 client = TestClient(app)
 
+APPLICATION_JSON = "application/json"
 
 @pytest.fixture(scope="module")
 def api_token():
@@ -43,7 +44,7 @@ def test_api_a_invalid_input(api_token):
     response = client.get(
         "/api_a/a",
         headers={
-            "Accept": "application/json",
+            "Accept": APPLICATION_JSON,
             "Authorization": api_token,
         },
     )
@@ -55,7 +56,7 @@ def test_api_a_ok(api_token):
     response = client.get(
         "/api_a/200",
         headers={
-            "Accept": "application/json",
+            "Accept": APPLICATION_JSON,
             "Authorization": api_token,
         },
     )
@@ -80,7 +81,7 @@ def test_api_b_invalid_input(api_token):
     response = client.get(
         "/api_b/b",
         headers={
-            "Accept": "application/json",
+            "Accept": APPLICATION_JSON,
             "Authorization": api_token,
         },
     )
@@ -92,7 +93,7 @@ def test_api_b_ok(api_token):
     response = client.get(
         "/api_b/300",
         headers={
-            "Accept": "application/json",
+            "Accept": APPLICATION_JSON,
             "Authorization": api_token,
         },
     )

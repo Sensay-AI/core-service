@@ -1,32 +1,11 @@
 import requests
 
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import sessionmaker
-# from sqlalchemy.pool import StaticPool
-# import pytest
 from app.core.config import (
     API_AUDIENCE,
     AUTH_TEST_CLIENT_ID,
     AUTH_TEST_CLIENT_SECRET,
     DOMAIN_AUTH0,
 )
-
-# from app.db.database import Base
-
-# engine = create_engine(
-#     POSTGRESQL_URI,
-#     poolclass=StaticPool,
-# )
-# TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-#
-#
-# @pytest.fixture(scope="module")
-# def db_session():
-#     Base.metadata.create_all(engine)
-#     session = TestingSessionLocal()
-#     yield session
-#     session.rollback()
-#     session.close()
 
 
 class MockToken:
