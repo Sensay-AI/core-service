@@ -4,6 +4,8 @@ from starlette.config import Config
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent  # app/
 BASE_DIR = ROOT.parent  # ./
+SUPPORTED_LANGUAGES = "vietnamese,english,japanese,spanish"
+
 API_V1_STR = "/api/v1"
 config = Config(BASE_DIR / ".env")
 
@@ -26,7 +28,7 @@ AUTH0_ALGORITHMS = config("AUTH0_ALGORITHMS", str)
 POSTGRESQL_URI = config("POSTGRESQL_URI", str)
 
 # aws conf
-S3_IMAGE_BUCKET = config("S3_IMAGE_BUCKET", str, default='sensayai-images')
+S3_IMAGE_BUCKET = config("S3_IMAGE_BUCKET", str, default="sensayai-images")
 AWS_ACCESS_KEY = config("AWS_ACCESS_KEY", str)
 AWS_SECRET_KEY = config("AWS_SECRET_KEY", str)
 AWS_REGION = config("AWS_REGION", str)
@@ -37,10 +39,6 @@ OPENAI_API_KEY = config("OPENAI_API_KEY", str)
 # caption model config
 IMAGE_CAPTIONING_MODEL = config("IMAGE_CAPTIONING_MODEL", str)
 REPLICATE_API_TOKEN = config("REPLICATE_API_TOKEN", str)
-
-# app langugages
-SUPPORTED_LANGUAGES = config("SUPPORTED_LANGUAGES", str)
-
 
 # Testing--------------
 AUTH_TEST_CLIENT_ID = "gJXFX5OnAeozyav7iwYtd5MFGV59YZ5T"
