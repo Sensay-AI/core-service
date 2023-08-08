@@ -28,7 +28,8 @@ class Language(StrEnum):
     japanese = auto()
 =======
     vietnamse = auto()
->>>>>>> 90f0aa9 (implemen image captioning SAI-27)
+    spanish = auto()
+    japanese = auto()
 
 
 class ImageCaptionRequest(BaseModel):
