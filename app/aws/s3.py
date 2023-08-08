@@ -12,7 +12,7 @@ from app.utils.utils import logger
 
 @singleton
 class S3Image:
-    def __init__(self):
+    def __init__(self) -> None:
         self.s3_client = boto3.client(
             "s3",
             aws_access_key_id=config.AWS_ACCESS_KEY,
