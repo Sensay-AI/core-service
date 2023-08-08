@@ -1,20 +1,26 @@
 import io
 from http import HTTPStatus
 
-from PIL import Image
-from fastapi import UploadFile, APIRouter, HTTPException
+from PIL import Image, UnidentifiedImageError
+from fastapi import UploadFile, APIRouter, HTTPException, Depends, status
+
 from app.aws.s3 import S3Image
+from app.core.auth0 import check_user
+from app.schemas.users import Auth0User
 from app.core import config
 
 router = APIRouter()
-s3Client = S3Image()
 
 
-@router.post("/uploadimage")
+@router.post("/upload")
 async def upload_image_to_s3(
-    image_file: UploadFile,
-    user_id: str
+    image_file: UploadFile, user_id: str, auth: Auth0User = Depends(check_user)
 ) -> dict[str, str]:
+    if not image_file.filename.lower().endswith((".png", ".jpg", ".jpeg")):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="the file you uploaded was not a valid image",
+        )
     image_file.file.seek(0)
     contents = image_file.file.read()
     temp_file = io.BytesIO()
@@ -22,20 +28,18 @@ async def upload_image_to_s3(
     temp_file.seek(0)
 
     try:
-        img = Image.open(temp_file)
-        img.verify()
-    except Exception:
+        Image.open(temp_file)
+    except UnidentifiedImageError:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="Not a valid image"
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Your image is corrupted or damaged",
         )
-    result = s3Client.upload_file(file=temp_file,
-                                  bucket_name=config.S3_IMAGE_BUCKET,
-                                  user_id=user_id
-                                  )
-    if result is not None:
-        return {"upload path": result}
+    result = S3Image().s3_client.upload_file(
+        file=temp_file, bucket_name=config.S3_IMAGE_BUCKET, user_id=user_id
+    )
+    if result:
+        return {"upload_path": result}
     raise HTTPException(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-        detail="We have an error uploading files"
+        detail="We have an error uploading files",
     )
