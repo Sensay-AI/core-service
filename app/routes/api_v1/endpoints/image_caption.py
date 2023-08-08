@@ -10,14 +10,18 @@ from app.captions.replicate_caption import CaptionGenerator
 from app.chatgpt.chatgpt_requests import rewrite_caption_in_language
 from app.core import config
 from app.db.database import get_db
-from app.models.image_caption import ImageCaptionRequest, UserImage
+from app.core.auth0 import check_user
+from app.schemas.users import Auth0User
+from app.models.image_caption import ImageCaptionRequest, ImageWithCaption, UserImage
 
 router = APIRouter()
 
 
 @router.post("/generate")
 def generate_caption(
-    input_data: ImageCaptionRequest, db: Session = Depends(get_db)
+    input_data: ImageCaptionRequest,
+    db: Session = Depends(get_db),
+    auth: Auth0User = Depends(check_user)
 ) -> Dict[str, str]:
     user_id = input_data.user_id
     language = input_data.language
@@ -49,11 +53,9 @@ def generate_caption(
     user_image_caption = (
         db.query(UserImage).filter(UserImage.user_id == user_id).first()
     )
-    new_image_caption = {
-        "language": language,
-        "image_url": input_data.image_url,
-        "caption": rewritten_caption,
-    }
+    new_image_caption = ImageWithCaption(
+        language=language, url=input_data.image_url, caption=rewritten_caption,
+    )
     if user_image_caption is not None:
         user_image_caption.captioned_images.append(new_image_caption)
     else:
