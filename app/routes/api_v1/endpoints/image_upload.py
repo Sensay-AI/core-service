@@ -1,4 +1,5 @@
 import io
+import pathlib
 from http import HTTPStatus
 from typing import Dict
 
@@ -17,7 +18,8 @@ router = APIRouter()
 async def upload_image_to_s3(
     image_file: UploadFile, user_id: str, auth: Auth0User = Depends(check_user)
 ) -> Dict[str, str]:
-    if not image_file.filename.lower().endswith((".png", ".jpg", ".jpeg")):
+    file_extension = pathlib.Path(image_file.filename).suffix
+    if file_extension not in [".png", ".jpg", ".jpeg"]:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="the file you uploaded was not a valid image",
@@ -36,7 +38,10 @@ async def upload_image_to_s3(
             detail="Your image is corrupted or damaged",
         )
     result = S3Image().s3_client.upload_file(
-        file=temp_file, bucket_name=config.S3_IMAGE_BUCKET, user_id=user_id
+        file=temp_file,
+        bucket_name=config.S3_IMAGE_BUCKET,
+        user_id=user_id,
+        extension=file_extension,
     )
     if result:
         return {"upload_path": result}

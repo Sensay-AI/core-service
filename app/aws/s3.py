@@ -28,9 +28,11 @@ class S3Image:
         except botocore.exceptions.ClientError:
             return ""
 
-    def upload_file(self, file: BytesIO, user_id: str, bucket_name: str) -> str:
+    def upload_file(
+        self, file: BytesIO, user_id: str, bucket_name: str, extension: str
+    ) -> str:
         hashed_name = hashlib.sha256(file.read()).hexdigest()
-        upload_path = f"user/{user_id}/{hashed_name}.jpg"
+        upload_path = f"user/{user_id}/{hashed_name}{extension}"
         path = self.check_file_exists(bucket_name, upload_path)
         if path:
             return path
