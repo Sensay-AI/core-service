@@ -1,13 +1,14 @@
 import io
 from http import HTTPStatus
+from typing import Dict
 
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from PIL import Image, UnidentifiedImageError
-from fastapi import UploadFile, APIRouter, HTTPException, Depends, status
 
 from app.aws.s3 import S3Image
+from app.core import config
 from app.core.auth0 import check_user
 from app.schemas.users import Auth0User
-from app.core import config
 
 router = APIRouter()
 
@@ -15,7 +16,7 @@ router = APIRouter()
 @router.post("/upload")
 async def upload_image_to_s3(
     image_file: UploadFile, user_id: str, auth: Auth0User = Depends(check_user)
-) -> dict[str, str]:
+) -> Dict[str, str]:
     if not image_file.filename.lower().endswith((".png", ".jpg", ".jpeg")):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
