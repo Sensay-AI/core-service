@@ -23,6 +23,8 @@ def validate_language_in_list(language: str) -> str:
 class Language(StrEnum):
     english = auto()
     vietnamse = auto()
+    spanish = auto()
+    japanese = auto()
 
 
 class ImageCaptionRequest(BaseModel):
