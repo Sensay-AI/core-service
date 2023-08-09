@@ -26,7 +26,13 @@ def generate_caption(
 ) -> Dict[str, str]:
     language = input_data.language
     image_url = input_data.image_url
-    user_id = auth.id
+    user_id = input_data.user_id
+    user_exist = db.query(UserInfo).filter(UserInfo.user_id == user_id).first()
+    if not user_exist:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail="The user id provided does not exist!",
+        )
     image_file = S3Image().s3_client.get_file(
         file_path=image_url, bucket_name=config.S3_IMAGE_BUCKET
     )
