@@ -1,8 +1,4 @@
 import openai
-<<<<<<< HEAD
-=======
-import json
->>>>>>> 90f0aa9 (implemen image captioning SAI-27)
 
 from app.core import config
 from app.utils.utils import logger
@@ -20,7 +16,8 @@ def rewrite_caption_in_language(caption: str, language: str) -> str:
     response_message = ""
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0613", messages=[{"role": "user", "content": prompt}],
+            model="gpt-3.5-turbo-0613",
+            messages=[{"role": "user", "content": prompt}],
         )
         response_message = response["choices"][0]["message"]["content"]
 <<<<<<< HEAD
