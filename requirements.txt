@@ -10,10 +10,6 @@ anyio==3.7.0
     #   starlette
 bcrypt==4.0.1
     # via fastapi-nano (pyproject.toml)
-black==23.7.0
-    # via fastapi-nano (pyproject.toml)
-build==0.10.0
-    # via pip-tools
 certifi==2023.7.22
     # via
     #   httpcore
@@ -24,10 +20,7 @@ cffi==1.15.1
 charset-normalizer==3.2.0
     # via requests
 click==8.1.3
-    # via
-    #   black
-    #   pip-tools
-    #   uvicorn
+    # via uvicorn
 coverage[toml]==7.2.7
     # via pytest-cov
 cryptography==41.0.1
@@ -53,25 +46,10 @@ idna==3.4
     #   requests
 iniconfig==2.0.0
     # via pytest
-mypy==1.4.1
-    # via fastapi-nano (pyproject.toml)
-mypy-extensions==1.0.0
-    # via
-    #   black
-    #   mypy
 packaging==23.1
-    # via
-    #   black
-    #   build
-    #   pytest
+    # via pytest
 passlib==1.7.4
     # via fastapi-nano (pyproject.toml)
-pathspec==0.11.2
-    # via black
-pip-tools==7.3.0
-    # via fastapi-nano (pyproject.toml)
-platformdirs==3.10.0
-    # via black
 pluggy==1.2.0
     # via pytest
 psycopg2-binary==2.9.6
@@ -86,8 +64,6 @@ pydantic==1.10.9
     # via fastapi
 pyjwt==2.1.0
     # via fastapi-nano (pyproject.toml)
-pyproject-hooks==1.0.0
-    # via build
 pytest==7.4.0
     # via
     #   fastapi-nano (pyproject.toml)
@@ -102,8 +78,6 @@ requests==2.31.0
     # via fastapi-nano (pyproject.toml)
 rsa==4.9
     # via python-jose
-ruff==0.0.283
-    # via fastapi-nano (pyproject.toml)
 singleton-decorator==1.0.0
     # via fastapi-nano (pyproject.toml)
 six==1.16.0
@@ -119,16 +93,12 @@ starlette==0.27.0
     # via fastapi
 typing-extensions==4.6.3
     # via
-    #   mypy
     #   pydantic
     #   sqlalchemy
 urllib3==2.0.4
     # via requests
 uvicorn==0.22.0
     # via fastapi-nano (pyproject.toml)
-wheel==0.41.1
-    # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
-# pip
 # setuptools
