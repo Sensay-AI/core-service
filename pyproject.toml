@@ -10,7 +10,11 @@ description = "A minimal FastAPI project template."
 readme = "README.md"
 keywords = ["fastapi", "template", "minimal", "docker", "cookiecutter"]
 license = {file = "LICENSE"}
-authors = [{name = "Redowan Delowar", email = "redowan.nafi@gmail.com"}]
+authors = [
+    { name = "Minh Nguyen", email = "minh.nldang@gmail.com" },
+    { name = "Tri Tran", email = "tri.trancongtoan@gmail.com" },
+    { name = "Binh Pham", email = "bnh.quang@gmail.com" }
+]
 dependencies = [
     "bcrypt",
     "fastapi",
@@ -18,7 +22,12 @@ dependencies = [
     "python-multipart",
     "uvicorn",
     "gunicorn",
-    "python-jose[cryptography]"
+    "python-jose[cryptography]",
+    "sqlalchemy",
+    "psycopg2-binary",
+    "PyJWT",
+    "singleton-decorator",
+    "requests"
 ]
 
 [project.optional-dependencies]
