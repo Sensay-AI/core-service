@@ -18,11 +18,16 @@ bcrypt==4.0.1
     #   -c requirements.txt
     #   fastapi-nano (pyproject.toml)
 black==23.7.0
-    # via fastapi-nano (pyproject.toml)
+    # via
+    #   -c requirements.txt
+    #   fastapi-nano (pyproject.toml)
 build==0.10.0
-    # via pip-tools
+    # via
+    #   -c requirements.txt
+    #   pip-tools
 certifi==2023.7.22
     # via
+    #   -c requirements.txt
     #   httpcore
     #   httpx
     #   requests
@@ -31,7 +36,9 @@ cffi==1.15.1
     #   -c requirements.txt
     #   cryptography
 charset-normalizer==3.2.0
-    # via requests
+    # via
+    #   -c requirements.txt
+    #   requests
 click==8.1.6
     # via
     #   -c requirements.txt
@@ -39,7 +46,9 @@ click==8.1.6
     #   pip-tools
     #   uvicorn
 coverage[toml]==7.2.7
-    # via pytest-cov
+    # via
+    #   -c requirements.txt
+    #   pytest-cov
 cryptography==41.0.3
     # via
     #   -c requirements.txt
@@ -62,9 +71,13 @@ h11==0.14.0
     #   httpcore
     #   uvicorn
 httpcore==0.17.3
-    # via httpx
+    # via
+    #   -c requirements.txt
+    #   httpx
 httpx==0.24.1
-    # via fastapi-nano (pyproject.toml)
+    # via
+    #   -c requirements.txt
+    #   fastapi-nano (pyproject.toml)
 idna==3.4
     # via
     #   -c requirements.txt
@@ -72,11 +85,16 @@ idna==3.4
     #   httpx
     #   requests
 iniconfig==2.0.0
-    # via pytest
+    # via
+    #   -c requirements.txt
+    #   pytest
 mypy==1.4.1
-    # via fastapi-nano (pyproject.toml)
+    # via
+    #   -c requirements.txt
+    #   fastapi-nano (pyproject.toml)
 mypy-extensions==1.0.0
     # via
+    #   -c requirements.txt
     #   black
     #   mypy
 packaging==23.1
@@ -91,13 +109,21 @@ passlib==1.7.4
     #   -c requirements.txt
     #   fastapi-nano (pyproject.toml)
 pathspec==0.11.2
-    # via black
+    # via
+    #   -c requirements.txt
+    #   black
 pip-tools==7.3.0
-    # via fastapi-nano (pyproject.toml)
+    # via
+    #   -c requirements.txt
+    #   fastapi-nano (pyproject.toml)
 platformdirs==3.10.0
-    # via black
+    # via
+    #   -c requirements.txt
+    #   black
 pluggy==1.2.0
-    # via pytest
+    # via
+    #   -c requirements.txt
+    #   pytest
 psycopg2-binary==2.9.7
     # via
     #   -c requirements.txt
@@ -124,13 +150,18 @@ pyjwt==2.8.0
     #   -c requirements.txt
     #   fastapi-nano (pyproject.toml)
 pyproject-hooks==1.0.0
-    # via build
+    # via
+    #   -c requirements.txt
+    #   build
 pytest==7.4.0
     # via
+    #   -c requirements.txt
     #   fastapi-nano (pyproject.toml)
     #   pytest-cov
 pytest-cov==4.1.0
-    # via fastapi-nano (pyproject.toml)
+    # via
+    #   -c requirements.txt
+    #   fastapi-nano (pyproject.toml)
 python-jose[cryptography]==3.3.0
     # via
     #   -c requirements.txt
@@ -140,13 +171,17 @@ python-multipart==0.0.6
     #   -c requirements.txt
     #   fastapi-nano (pyproject.toml)
 requests==2.31.0
-    # via fastapi-nano (pyproject.toml)
+    # via
+    #   -c requirements.txt
+    #   fastapi-nano (pyproject.toml)
 rsa==4.9
     # via
     #   -c requirements.txt
     #   python-jose
 ruff==0.0.283
-    # via fastapi-nano (pyproject.toml)
+    # via
+    #   -c requirements.txt
+    #   fastapi-nano (pyproject.toml)
 singleton-decorator==1.0.0
     # via
     #   -c requirements.txt
@@ -178,13 +213,17 @@ typing-extensions==4.7.1
     #   pydantic-core
     #   sqlalchemy
 urllib3==2.0.4
-    # via requests
+    # via
+    #   -c requirements.txt
+    #   requests
 uvicorn==0.23.2
     # via
     #   -c requirements.txt
     #   fastapi-nano (pyproject.toml)
 wheel==0.41.1
-    # via pip-tools
+    # via
+    #   -c requirements.txt
+    #   pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
