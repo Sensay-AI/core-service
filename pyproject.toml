@@ -31,6 +31,7 @@ dependencies = [
     "pytest",
     "pytest-cov",
     "requests", # Required by fastapi-test.
+    "pip-tools",
 ]
 
 [project.optional-dependencies]
@@ -38,7 +39,6 @@ dev = [
     "black",
     "mypy",
     "ruff",
-    "pip-tools",
 ]
 [project.urls]
 Repository = "https://github.com/rednafi/fastapi-nano.git"
