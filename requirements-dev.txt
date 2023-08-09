@@ -113,13 +113,16 @@ typing-extensions==4.6.3
     # via
     #   mypy
     #   pydantic
-urllib3==2.0.3
+urllib3
     # via requests
 uvicorn==0.22.0
     # via fastapi-nano (pyproject.toml)
 wheel==0.40.0
     # via pip-tools
-
+Pillow==10.0.0
+boto3==1.28.16
+replicate==0.10.0
+openai==0.27.8
 # The following packages are considered to be unsafe in a requirements file:
 # pip
 # setuptools
