@@ -59,8 +59,8 @@ jobs:
       - name: Install the Dependencies
         run: |
           echo "Installing the dependencies..."
-          pip install .
-          pip install .[dev]
+          python -m pip install -r requirements.txt
+          python -m pip install -r requirements-dev.txt
 
       - name: Check Linter
         run: |
