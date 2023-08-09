@@ -30,8 +30,14 @@ idna==3.4
     # via
     #   anyio
     #   requests
+iniconfig==2.0.0
+    # via pytest
+packaging==23.1
+    # via pytest
 passlib==1.7.4
     # via fastapi-nano (pyproject.toml)
+pluggy==1.2.0
+    # via pytest
 psycopg2-binary==2.9.6
     # via fastapi-nano (pyproject.toml)
 pyasn1==0.5.0
@@ -43,6 +49,8 @@ pycparser==2.21
 pydantic==1.10.9
     # via fastapi
 pyjwt==2.1.0
+    # via fastapi-nano (pyproject.toml)
+pytest==7.4.0
     # via fastapi-nano (pyproject.toml)
 python-jose[cryptography]==3.3.0
     # via fastapi-nano (pyproject.toml)
