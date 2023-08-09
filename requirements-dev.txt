@@ -123,6 +123,7 @@ Pillow==10.0.0
 boto3==1.28.16
 replicate==0.10.0
 openai==0.27.8
+fastapi-utils==0.2.1
 # The following packages are considered to be unsafe in a requirements file:
 # pip
 # setuptools
