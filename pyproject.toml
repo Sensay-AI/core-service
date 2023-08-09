@@ -27,7 +27,6 @@ dependencies = [
     "psycopg2-binary",
     "PyJWT",
     "singleton-decorator",
-    "requests"
 ]
 
 [project.optional-dependencies]
