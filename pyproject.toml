@@ -27,18 +27,19 @@ dependencies = [
     "psycopg2-binary",
     "PyJWT",
     "singleton-decorator",
-    "httpx",
-    "pytest",
-    "pytest-cov",
-    "requests", # Required by fastapi-test.
-    "pip-tools",
+
 ]
 
 [project.optional-dependencies]
 dev = [
     "black",
+    "httpx",
     "mypy",
-    "ruff",
+    "pip-tools",
+    "pytest",
+    "pytest-cov",
+    "requests", # Required by fastapi-test.
+    "ruff"
 ]
 [project.urls]
 Repository = "https://github.com/rednafi/fastapi-nano.git"
