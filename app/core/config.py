@@ -4,10 +4,10 @@ from starlette.config import Config
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent  # app/
 BASE_DIR = ROOT.parent  # ./
-SUPPORTED_LANGUAGES = "vietnamese,english,japanese,spanish"
-
 API_V1_STR = "/api/v1"
 config = Config(BASE_DIR / ".env")
+
+SUPPORTED_LANGUAGES = "vietnamese,english,japanese,spanish"
 
 API_USERNAME = config("API_USERNAME", str)
 API_PASSWORD = config("API_PASSWORD", str)
@@ -29,16 +29,16 @@ POSTGRESQL_URI = config("POSTGRESQL_URI", str)
 
 # aws conf
 S3_IMAGE_BUCKET = config("S3_IMAGE_BUCKET", str, default="sensayai-images")
-AWS_ACCESS_KEY = config("AWS_ACCESS_KEY", str)
-AWS_SECRET_KEY = config("AWS_SECRET_KEY", str)
+AWS_ACCESS_KEY = config("AWS_ACCESS_KEY", str, default="")
+AWS_SECRET_KEY = config("AWS_SECRET_KEY", str, default="")
 AWS_REGION = config("AWS_REGION", str)
 
 # openai conf
-OPENAI_API_KEY = config("OPENAI_API_KEY", str)
+OPENAI_API_KEY = config("OPENAI_API_KEY", str, default="")
 
 # caption model config
 IMAGE_CAPTIONING_MODEL = config("IMAGE_CAPTIONING_MODEL", str)
-REPLICATE_API_TOKEN = config("REPLICATE_API_TOKEN", str)
+REPLICATE_API_TOKEN = config("REPLICATE_API_TOKEN", str, default="")
 
 # Testing--------------
 AUTH_TEST_CLIENT_ID = "gJXFX5OnAeozyav7iwYtd5MFGV59YZ5T"
