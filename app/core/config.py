@@ -27,8 +27,8 @@ POSTGRESQL_URI = config("POSTGRESQL_URI", str)
 
 # aws conf
 S3_IMAGE_BUCKET = config("S3_IMAGE_BUCKET", str, default="sensayai-images")
-AWS_ACCESS_KEY = config("AWS_ACCESS_KEY", str)
-AWS_SECRET_KEY = config("AWS_SECRET_KEY", str)
+AWS_ACCESS_KEY = config("AWS_ACCESS_KEY", str, default="")
+AWS_SECRET_KEY = config("AWS_SECRET_KEY", str, default="")
 AWS_REGION = config("AWS_REGION", str)
 
 # Testing--------------
