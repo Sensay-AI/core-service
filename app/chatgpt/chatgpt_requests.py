@@ -16,8 +16,7 @@ def rewrite_caption_in_language(caption: str, language: str) -> str:
     response_message = ""
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0613",
-            messages=[{"role": "user", "content": prompt}],
+            model="gpt-3.5-turbo-0613", messages=[{"role": "user", "content": prompt}],
         )
         response_message = response["choices"][0]["message"]["content"]
 <<<<<<< HEAD

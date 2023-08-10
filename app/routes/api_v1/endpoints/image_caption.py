@@ -41,8 +41,7 @@ def generate_caption(
         image_file = image_file["Body"].read()
     else:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="The image does not exist",
+            status_code=HTTPStatus.BAD_REQUEST, detail="The image does not exist",
         )
     image_file = BytesIO(image_file)
     caption = CaptionGenerator().generate_from_image(
