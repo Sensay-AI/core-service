@@ -19,21 +19,22 @@ class ChatGPTVocabularyGenerator(object):
     _model = OpenAI(openai_api_key=OPEN_API_KEY, max_tokens=-1, temperature=0.5)
 
     _vocabulary_format = """{
-                "lesson": <prompt of lesson>,
+                "lesson": "<prompt of lesson without a newline>",
                 "questions": [
                 {
-                    "Question": "What is the term used for a person who runs in a race?",
-                    "Options": ["Swimmer", "Runner", "Cyclist"],
-                    "Answer": "Runner"
+                    "question": "What is the term used for a person who runs in a race?",
+                    "options": ["Swimmer", "Runner", "Cyclist"],
+                    "answer": "Runner"
                 }
                 ]
             }"""
+
     _vocabulary_template = """
             Create a prompt lesson more than 100 words about {{ category }} and suggest {{ num_questions }} vocabulary 
             to learn {{ learning_language }} in multiple-choice format with {{ num_answers }} answers, 
             display the answer for each question  and translate to {{ primary_language }}
             Do not include any explanations, only provide a RFC8259 compliant JSON response following 
-            this format without deviation:
+            this format without deviation, the lesson must not include a newline and special characters:
             {
                     "{{ learning_language }}": {{ format_output }},
                     "{{ primary_language }}": {{ format_output }}
@@ -68,11 +69,12 @@ class ChatGPTVocabularyGenerator(object):
             LOG.debug(f"[Vocabulary] Prompt: {prompt}")
 
             response = self._model.predict(prompt)
-
+            response = response.replace("\\n", " ")
             LOG.debug(f"[Vocabulary] Execution time: {datetime.now() - start}")
+            print(response)
+            LOG.debug(f"[Vocabulary] Response: {prompt}")
 
             return json.loads(response)
-
         except Exception as e:
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
