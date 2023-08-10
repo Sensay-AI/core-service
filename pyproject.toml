@@ -106,3 +106,44 @@ console_output_style = "progress"
 
 [tool.setuptools.packages.find]
 where = ["app"]  # ["."] by default
+
+[tool.poetry]
+name = "fastapi-nano"
+version = "0.1.0"
+description = "CoreService for Sensay-AI created from A minimal FastAPI project template."
+authors = [
+    "minhnguyen <minh.nldang@gmail.com>",
+    "Tri Tran <tri.trancongtoan@gmail.com>",
+    "Binh Pham <bnh.quang@gmail.com>"
+]
+readme = "README.md"
+packages = [{include = "fastapi_nano"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+bcrypt = "^4.0.1"
+fastapi = "^0.97.0"
+passlib = "^1.7.4"
+python-multipart = "^0.0.6"
+uvicorn = "^0.22.0"
+gunicorn = "^20.1.0"
+python-jose = "^3.3.0"
+sqlalchemy = "^2.0.19"
+psycopg2-binary = "^2.9.6"
+pyjwt = "^2.1.0"
+singleton-decorator = "^1.0.0"
+cryptography = "^41.0.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+httpx = "^0.24.1"
+mypy = "^1.4.1"
+pip-tools = "^7.3.0"
+pytest-cov = "^4.1.0"
+ruff = "^0.0.284"
+pytest = "^7.3.2"
+requests = "^2.31.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
