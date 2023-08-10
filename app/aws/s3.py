@@ -39,7 +39,9 @@ class S3Image:
         file.seek(0)
         try:
             self.s3_client.upload_fileobj(
-                file, Bucket=bucket_name, Key=upload_path,
+                file,
+                Bucket=bucket_name,
+                Key=upload_path,
             )
             return upload_path
         except Exception as error:
