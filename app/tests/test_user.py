@@ -20,6 +20,7 @@ def test_get_user_info_without_token():
     )
     assert response.status_code == HTTPStatus.FORBIDDEN
 
+
 # TODO: Fix this failing on this test
 # def test_get_user_info():
 #     response = client.get(
