@@ -12,7 +12,7 @@ from app.core import config
 from app.core.auth0 import check_user
 from app.db.database import get_db
 from app.models.image_caption import ImageCaption, ImageCaptionRequest
-from app.models.user import UserInfo
+from app.models.users import UserInfo
 from app.schemas.users import Auth0User
 
 router = APIRouter()
@@ -40,8 +40,7 @@ def generate_caption(
         image_file = image_file["Body"].read()
     else:
         raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail="The image does not exist",
+            status_code=HTTPStatus.BAD_REQUEST, detail="The image does not exist",
         )
     image_file = BytesIO(image_file)
     caption = CaptionGenerator().generate_from_image(
