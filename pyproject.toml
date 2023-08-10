@@ -133,6 +133,7 @@ psycopg2-binary = "^2.9.6"
 pyjwt = "^2.1.0"
 singleton-decorator = "^1.0.0"
 cryptography = "^41.0.1"
+boto3 = "^1.28.23"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
@@ -143,6 +144,9 @@ pytest-cov = "^4.1.0"
 ruff = "^0.0.284"
 pytest = "^7.3.2"
 requests = "^2.31.0"
+pillow = "^10.0.0"
+replicate = "^0.11.0"
+openai = "^0.27.8"
 
 [build-system]
 requires = ["poetry-core"]
