@@ -107,7 +107,7 @@ requests==2.31.0
     # via fastapi-nano (pyproject.toml)
 rsa==4.9
     # via python-jose
-ruff==0.0.283
+ruff==0.0.284
     # via fastapi-nano (pyproject.toml)
 singleton-decorator==1.0.0
     # via fastapi-nano (pyproject.toml)
