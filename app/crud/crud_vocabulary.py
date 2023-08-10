@@ -1,9 +1,10 @@
 from http import HTTPStatus
-from typing import Any, Optional
+from typing import Any, Optional, Type
 
 from fastapi import HTTPException
+from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.crud.base import CRUDBase
 from app.models.language import Language
@@ -13,9 +14,7 @@ from app.models.vocabulary import (
     VocabularyPrompt,
     VocabularyQuestion,
 )
-from app.schemas.vocabulary import (
-    VocabularyPromptCreate,
-)
+from app.schemas.vocabulary import GetVocabularyHistoryQuestion, VocabularyPromptCreate
 
 
 class CRUDVocabularyPrompt(CRUDBase[VocabularyPrompt, VocabularyPromptCreate, Any]):
@@ -74,3 +73,28 @@ class CRUDVocabularyPrompt(CRUDBase[VocabularyPrompt, VocabularyPromptCreate, An
         db.add_all(questions)
         db.add_all(answers)
         db.commit()
+
+    def get_history_questions(
+        self, db: Session, input: GetVocabularyHistoryQuestion, user_id: str
+    ) -> list[Type[VocabularyPrompt]]:
+        prompts = (
+            db.query(VocabularyPrompt)
+            .join(Category)
+            .options(
+                joinedload(VocabularyPrompt.questions).joinedload(
+                    VocabularyQuestion.answers
+                )
+            )
+            .filter(
+                and_(
+                    Category.id == input.category_id,
+                    Category.user_id == user_id,
+                    Language.language_name == input.learning_language.upper(),
+                    VocabularyPrompt.is_valid,
+                )
+            )
+            .limit(input.limit_prompts)
+            .all()
+        )
+
+        return prompts

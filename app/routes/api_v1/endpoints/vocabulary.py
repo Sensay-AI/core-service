@@ -9,9 +9,13 @@ from app.core.auth0 import check_user
 from app.crud.crud_vocabulary import CRUDVocabularyPrompt
 from app.db.database import get_db
 from app.llm.vocabulary import ChatGPTVocabularyGenerator
-from app.models.vocabulary import Category, VocabularyPrompt
+from app.models.vocabulary import (
+    Category,
+    VocabularyPrompt,
+)
 from app.schemas.users import Auth0User
 from app.schemas.vocabulary import (
+    GetVocabularyHistoryQuestion,
     GetVocabularyQuestions,
     VocabularyAnswerCreate,
     VocabularyPromptCreate,
@@ -96,10 +100,23 @@ async def get_new_vocabulary_questions(
     return {"items": questions}
 
 
-@router.get("/categories")
+@router.get("/category")
 async def get_user_categories(
     *, db: Session = Depends(get_db), auth: Auth0User = Depends(check_user)
 ) -> dict[str, Any]:
     categories = db.query(Category).filter(Category.user_id == auth.id).limit(100).all()
     categories = [category.__dict__ for category in categories]
     return {"items": categories}
+
+
+@router.post("/category/history/questions")
+async def get_history_question_by_category(
+    *,
+    db: Session = Depends(get_db),
+    input: GetVocabularyHistoryQuestion,
+    auth: Auth0User = Depends(check_user),
+) -> dict[str, Any]:
+    prompts = CRUDVocabularyPrompt(VocabularyPromptCreate).get_history_questions(
+        db, input, auth.id
+    )
+    return {"items": prompts}

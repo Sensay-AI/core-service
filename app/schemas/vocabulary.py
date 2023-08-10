@@ -9,6 +9,12 @@ class GetVocabularyQuestions(BaseModel):
     num_answers: int = 4
 
 
+class GetVocabularyHistoryQuestion(BaseModel):
+    category_id: int
+    limit_prompts: int = 10
+    learning_language: str
+
+
 class VocabularyAnswerCreate(BaseModel):
     answer_text: str
     is_correct: bool
