@@ -26,15 +26,19 @@ dependencies = [
     "sqlalchemy",
     "psycopg2-binary",
     "PyJWT",
-    "singleton-decorator",
-    "pytest",
-    "requests", # Required by fastapi-test.
+    "singleton-decorator"
+]
+
+[project.optional-dependencies]
+dev = [
     "black",
     "httpx",
     "mypy",
     "pip-tools",
     "pytest-cov",
-    "ruff"
+    "ruff",
+    "pytest",
+    "requests" # Required by fastapi-test.
 ]
 
 [project.urls]
