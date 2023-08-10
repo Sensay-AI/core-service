@@ -1,6 +1,5 @@
-from enum import auto
+from enum import StrEnum, auto
 
-from fastapi_utils.enums import StrEnum
 from pydantic import BaseModel, Field, validator
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.sql import func
