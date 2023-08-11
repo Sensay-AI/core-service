@@ -137,6 +137,7 @@ boto3 = "^1.28.23"
 openai = "^0.27.8"
 replicate = "^0.11.0"
 pillow = "^10.0.0"
+boto3-type-annotations-with-docs = "^0.3.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"

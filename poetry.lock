@@ -269,6 +269,17 @@ s3transfer = ">=0.6.0,<0.7.0"
 crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
+name = "boto3-type-annotations-with-docs"
+version = "0.3.1"
+description = "Type annotations for boto3. Adds code completion in IDEs such as PyCharm."
+optional = false
+python-versions = "*"
+files = [
+    {file = "boto3_type_annotations_with_docs-0.3.1-py3-none-any.whl", hash = "sha256:77f8e9ee3d3bfb566ffe54dce2bb46510d25460ff80212256f1eb3199cd16f92"},
+    {file = "boto3_type_annotations_with_docs-0.3.1.tar.gz", hash = "sha256:d513c53246deb2d6b13c38ccfde801eaecd47ab9f5c9ae9883386fe163b88905"},
+]
+
+[[package]]
 name = "botocore"
 version = "1.31.23"
 description = "Low-level, data-driven core of boto 3."
@@ -1908,4 +1919,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "6a4fdba56bca2778a5e2fa6978b0006f8afb4fc0ee7c0dec25bc5b3d00f83b23"
+content-hash = "435554304b4d94948a7c83e2a793964556dca28cf7a0bd2803ca87abeef1e462"
