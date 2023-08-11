@@ -5,6 +5,7 @@ import boto3
 import botocore
 import botocore.exceptions
 from singleton_decorator import singleton
+from boto3_type_annotations.s3 import Client
 
 from app.core import config
 from app.utils.utils import logger
@@ -12,6 +13,8 @@ from app.utils.utils import logger
 
 @singleton
 class S3Image:
+    s3_client: Client
+
     def __init__(self) -> None:
         self.s3_client = boto3.client(
             "s3",
