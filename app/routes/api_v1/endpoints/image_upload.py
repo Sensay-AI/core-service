@@ -16,7 +16,7 @@ router = APIRouter()
 
 @router.post("/upload")
 async def upload_image_to_s3(
-    image_file: UploadFile, user_id: str, auth: Auth0User = Depends(check_user)
+    image_file: UploadFile, auth: Auth0User = Depends(check_user)
 ) -> Dict[str, str]:
     file_extension = pathlib.Path(image_file.filename).suffix
     if file_extension not in [".png", ".jpg", ".jpeg"]:
@@ -40,7 +40,7 @@ async def upload_image_to_s3(
     result = S3Image().s3_client.upload_file(
         file=temp_file,
         bucket_name=config.S3_IMAGE_BUCKET,
-        user_id=user_id,
+        user_id=auth.id,
         extension=file_extension,
     )
     if result:
