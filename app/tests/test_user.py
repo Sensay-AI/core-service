@@ -57,4 +57,4 @@ def test_create_user():
             "date_of_birth": "2005-07-26",
         },
     )
-    assert resp.status_code in (HTTPStatus.OK, HTTPStatus.BAD_REQUEST)
+    assert resp.status_code in (HTTPStatus.OK, HTTPStatus.NOT_FOUND)
