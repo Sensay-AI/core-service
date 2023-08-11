@@ -10,6 +10,7 @@ client = TestClient(app)
 
 APPLICATION_JSON = "application/json"
 
+
 @pytest.fixture(scope="module")
 def api_token():
     # Get token.

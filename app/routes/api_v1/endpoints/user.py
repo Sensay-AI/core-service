@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from http import HTTPStatus
-from typing import Any, Optional, Dict, Coroutine
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
@@ -9,21 +9,24 @@ from sqlalchemy.orm import Session
 
 from app.core.auth0 import check_user
 from app.db.database import get_db
-from app.models.users import UserInfo, Gender
+from app.models.users import UserInfo
 from app.schemas.users import Auth0User, UserUpdate
 
 router = APIRouter()
 
 
-
-async def query_user_info(auth, db) -> Optional[UserInfo]:
-    user: Optional[UserInfo] = db.query(UserInfo).filter(UserInfo.user_id == auth.id).first()
+async def query_user_info(
+    auth: Auth0User = Depends(check_user), db: Session = Depends(get_db)
+) -> Optional[UserInfo]:
+    user: Optional[UserInfo] = (
+        db.query(UserInfo).filter(UserInfo.user_id == auth.id).first()
+    )
     return user
 
 
 @router.get("/")
 async def get_user_profile(
-        *, db: Session = Depends(get_db), auth: Auth0User = Depends(check_user)
+    *, db: Session = Depends(get_db), auth: Auth0User = Depends(check_user)
 ) -> dict[str, Any]:
     user = await query_user_info(auth, db)
     if not user:
@@ -34,13 +37,12 @@ async def get_user_profile(
     return user.__dict__
 
 
-
 @router.post("/create")
 async def create_user_profile(
-        *,
-        user_input: UserUpdate,
-        db: Session = Depends(get_db),
-        auth: Auth0User = Depends(check_user),
+    *,
+    user_input: UserUpdate,
+    db: Session = Depends(get_db),
+    auth: Auth0User = Depends(check_user),
 ) -> dict[str, Any]:
     user = await query_user_info(auth, db)
     if user:
@@ -58,7 +60,7 @@ async def create_user_profile(
         user.phone_number = user_input.phone_number
         user.nickname = user_input.nickname
         user.date_of_birth = user_input.date_of_birth
-        user.gender = user_input.gender.name
+        user.gender = "" if user_input.gender is None else user_input.gender.name
         user.picture = user_input.picture
         db.add(user)
         db.commit()
@@ -74,10 +76,10 @@ async def create_user_profile(
 
 @router.put("/update")
 async def update_user_profile(
-        *,
-        user_input: UserUpdate,
-        db: Session = Depends(get_db),
-        auth: Auth0User = Depends(check_user),
+    *,
+    user_input: UserUpdate,
+    db: Session = Depends(get_db),
+    auth: Auth0User = Depends(check_user),
 ) -> dict[str, Any]:
     user = await query_user_info(auth, db)
     if not user:
@@ -93,7 +95,7 @@ async def update_user_profile(
         user.phone_number = user_input.phone_number
         user.nickname = user_input.nickname
         user.date_of_birth = user_input.date_of_birth
-        user.gender = user_input.gender.name
+        user.gender = "" if user_input.gender is None else user_input.gender.name
         user.picture = user_input.picture
         db.commit()
         db.refresh(user)
