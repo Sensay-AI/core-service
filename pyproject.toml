@@ -133,7 +133,6 @@ pyjwt = "^2.1.0"
 singleton-decorator = "^1.0.0"
 cryptography = "^41.0.1"
 boto3 = "^1.28.23"
-<<<<<<< HEAD
 pillow = "^10.0.0"
 replicate = "^0.11.0"
 openai = "^0.27.8"
@@ -141,11 +140,6 @@ boto3-type-annotations-with-docs = "^0.3.1"
 dependency-injector = "^4.41.0"
 pyyaml = "^6.0.1"
 sentry-sdk = { version = "*", extras = ["fastapi"] }
-=======
-openai = "^0.27.8"
-replicate = "^0.11.0"
-pillow = "^10.0.0"
->>>>>>> 934b397 (remove broad exceptions, use auth.id)
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
