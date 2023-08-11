@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
+from app.models.users import Gender
+
 
 class Auth0User(BaseModel):
     id: str = Field(..., alias="sub")
@@ -17,3 +19,5 @@ class UserUpdate(BaseModel):
     phone_number: Optional[str]
     nickname: Optional[str]
     date_of_birth: Optional[date]
+    gender: Optional[Gender]
+    picture: Optional[str]
