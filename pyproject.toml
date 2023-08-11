@@ -134,6 +134,9 @@ pyjwt = "^2.1.0"
 singleton-decorator = "^1.0.0"
 cryptography = "^41.0.1"
 boto3 = "^1.28.23"
+openai = "^0.27.8"
+replicate = "^0.11.0"
+pillow = "^10.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
