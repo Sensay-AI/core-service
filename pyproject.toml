@@ -117,7 +117,6 @@ authors = [
     "Binh Pham <bnh.quang@gmail.com>"
 ]
 readme = "README.md"
-packages = [{include = "fastapi_nano"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
