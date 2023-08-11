@@ -1,6 +1,7 @@
 from io import BytesIO
 
 import replicate
+from replicate.exceptions import ReplicateError
 from singleton_decorator import singleton
 
 from app.core import config
@@ -16,14 +17,17 @@ class CaptionGenerator:
         )
 
     def generate_from_image(self, prompt: str, image_file: BytesIO) -> str:
+        caption = []
         try:
             output = self.replicate_generator.run(
                 self.mplug_model_id, input={"prompt": prompt, "img": image_file}
             )
-            caption = []
+
             for word in output:
                 caption.append(word)
-        except Exception as e:
+        except ReplicateError as e:
             logger.error(f"Replicate Error {e}", exc_info=True)
-            return ""
+        except Exception as e:
+            logger.error(f"Got an error when generating caption: {e}", exc_info=True)
+
         return "".join(caption)

@@ -26,7 +26,7 @@ def generate_caption(
 ) -> Dict[str, str]:
     language = input_data.language
     image_url = input_data.image_url
-    user_id = input_data.user_id
+    user_id = auth.id
     user_exist = db.query(UserInfo).filter(UserInfo.user_id == user_id).first()
     if not user_exist:
         raise HTTPException(

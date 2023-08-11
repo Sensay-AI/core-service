@@ -26,9 +26,6 @@ class Language(StrEnum):
 
 
 class ImageCaptionRequest(BaseModel):
-    user_id: str = Field(
-        default="", description="user id for saving history for further analysis"
-    )
     image_url: str = Field(description="image url to generation captions from")
     language: str = Field(description="languages to generate caption in")
 
