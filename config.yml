@@ -1,0 +1,12 @@
+infrastructures:
+  aws:
+    access_key_id: ""
+    secret_access_key: ""
+    s3_image_bucket: "sensayai-images"
+  db:
+    url: ""
+  auth0:
+    domain: "dev-kpookvh6nj230wwk.us.auth0.com"
+    audience: "https://dev-kpookvh6nj230wwk.us.auth0.com/api/v2/"
+    issuer: "https://dev-kpookvh6nj230wwk.us.auth0.com/"
+    algorithms: "RS256"

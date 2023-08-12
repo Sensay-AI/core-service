@@ -2,7 +2,7 @@ import enum
 
 from sqlalchemy import Column, Date, DateTime, Integer, String, func
 
-from app.db.database import Base
+from app.infrastructure.db.database import Base
 
 
 class Gender(enum.Enum):

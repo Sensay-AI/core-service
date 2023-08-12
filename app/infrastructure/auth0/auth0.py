@@ -1,21 +1,14 @@
+import logging
 from http import HTTPStatus
 from typing import Any
 
 import jwt
-from fastapi import Depends, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import HTTPException
 
-from app.core.config import API_AUDIENCE, AUTH0_ALGORITHMS, AUTH0_ISSUER, DOMAIN_AUTH0
 from app.schemas.users import Auth0User
 
 
-async def check_user(
-    token: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
-) -> Auth0User:
-    return Auth0Helper.verify_token(token.credentials)
-
-
-def _check_claims(
+def check_claims(
     payload: dict[str, Any],
     claim_name: str,
     claim_type: Any,
@@ -43,18 +36,31 @@ def _check_claims(
             )
 
 
-class Auth0Helper(object):
-    _jwks_url = f"https://{DOMAIN_AUTH0}/.well-known/jwks.json"
-    _jwks_client = jwt.PyJWKClient(_jwks_url)
+class Auth0Service:
+    auth0_issuer: str
+    api_audience: str
+    auth0_algorithms: str
 
-    @staticmethod
+    def __init__(
+        self, domain: str, algorithms: str, audience: str, issuer: str
+    ) -> None:
+        self.logger = logging.getLogger(
+            f"{__name__}.{self.__class__.__name__}",
+        )
+        self._jwks_url = f"https://{domain}/.well-known/jwks.json"
+        self._jwks_client = jwt.PyJWKClient(self._jwks_url)
+        self.auth0_algorithms = algorithms
+        self.api_audience = audience
+        self.auth0_issuer = issuer
+
     def verify_token(
+        self,
         token: str,
         permissions: Any = None,
         scopes: Any = None,
     ) -> Auth0User:
         try:
-            signing_key = Auth0Helper._jwks_client.get_signing_key_from_jwt(token).key
+            signing_key = self._jwks_client.get_signing_key_from_jwt(token).key
         except jwt.exceptions.PyJWKClientError as error:
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
@@ -70,9 +76,9 @@ class Auth0Helper(object):
             payload = jwt.decode(
                 token,
                 signing_key,
-                algorithms=AUTH0_ALGORITHMS,
-                audience=API_AUDIENCE,
-                issuer=AUTH0_ISSUER,
+                algorithms=self.auth0_algorithms,
+                audience=self.api_audience,
+                issuer=self.auth0_issuer,
             )
         except Exception as e:
             raise HTTPException(
@@ -81,10 +87,10 @@ class Auth0Helper(object):
             )
 
         if scopes:
-            _check_claims(payload, "scope", str, scopes)
+            check_claims(payload, "scope", str, scopes)
 
         if permissions:
-            _check_claims(payload, "permissions", list, permissions)
+            check_claims(payload, "permissions", list, permissions)
 
         user = Auth0User(**payload)
         user.permissions = payload["scope"].split(" ")

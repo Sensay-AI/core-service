@@ -3,20 +3,26 @@ import pathlib
 from http import HTTPStatus
 from typing import Dict
 
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from PIL import Image, UnidentifiedImageError
 
-from app.aws.s3 import S3Image
-from app.core import config
-from app.core.auth0 import check_user
+from app.container.containers import Container
+from app.infrastructure.aws.s3 import S3Service
+from app.routes.api_v1.endpoints.auth import check_user
 from app.schemas.users import Auth0User
 
+#
 router = APIRouter()
 
 
 @router.post("/upload")
+@inject
 async def upload_image_to_s3(
-    image_file: UploadFile, auth: Auth0User = Depends(check_user)
+    image_file: UploadFile,
+    auth: Auth0User = Depends(check_user),
+    s3_service: S3Service = Depends(Provide[Container.s3_service]),
+    s3_image_bucket: str = Depends(Provide[Container.s3_image_bucket]),
 ) -> Dict[str, str]:
     file_extension = pathlib.Path(image_file.filename).suffix
     if file_extension not in [".png", ".jpg", ".jpeg"]:
@@ -37,9 +43,9 @@ async def upload_image_to_s3(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Your image is corrupted or damaged",
         )
-    result = S3Image().s3_client.upload_file(
+    result = s3_service.upload_file(
         file=temp_file,
-        bucket_name=config.S3_IMAGE_BUCKET,
+        bucket_name=s3_image_bucket,
         user_id=auth.id,
         extension=file_extension,
     )
