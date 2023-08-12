@@ -61,4 +61,4 @@ jobs:
       - name: Run Tests
         run: |
           echo "Running the tests..."
-          cd app && poetry run pytest -v -s
+          poetry run pytest -v -s
