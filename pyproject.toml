@@ -30,7 +30,8 @@ dependencies = [
     "langchain",
     "openai",
     "tiktoken",
-    "jinja2"
+    "jinja2",
+    "alembic"
 ]
 
 [project.optional-dependencies]
