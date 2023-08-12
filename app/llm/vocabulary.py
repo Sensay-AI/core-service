@@ -47,7 +47,7 @@ class ChatGPTVocabularyGenerator(object):
     def generateVocabularyQuestion(
         self,
         category: str,
-        primary_language: str,
+        translated_language: str,
         learning_language: str,
         num_questions: int = 4,
         num_answers: int = 5,
@@ -60,7 +60,7 @@ class ChatGPTVocabularyGenerator(object):
 
             prompt = prompt_template.format(
                 category=category,
-                primary_language=primary_language,
+                primary_language=translated_language,
                 learning_language=learning_language,
                 num_questions=num_questions,
                 num_answers=num_answers,
@@ -70,10 +70,9 @@ class ChatGPTVocabularyGenerator(object):
 
             response = self._model.predict(prompt)
             response = response.replace("\\n", " ")
+            response = response.replace("\n", " ")
             LOG.debug(f"[Vocabulary] Execution time: {datetime.now() - start}")
-            print(response)
             LOG.debug(f"[Vocabulary] Response: {prompt}")
-
             return json.loads(response)
         except Exception as e:
             raise HTTPException(

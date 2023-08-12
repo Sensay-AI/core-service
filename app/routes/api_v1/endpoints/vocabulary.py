@@ -11,7 +11,6 @@ from app.db.database import get_db
 from app.llm.vocabulary import ChatGPTVocabularyGenerator
 from app.models.vocabulary import (
     Category,
-    VocabularyPrompt,
 )
 from app.schemas.users import Auth0User
 from app.schemas.vocabulary import (
@@ -26,52 +25,47 @@ router = APIRouter()
 
 
 def _parse_json_prompt(
-    category: str, language: str, data: dict
+    category: str, learning_language: str, translated_language: str, data: dict
 ) -> VocabularyPromptCreate:
     questions = []
-    data = data[language]
-    for question in data["questions"]:
+    data_learning = data[learning_language]
+    data_translated = data[translated_language]
+    for question_learning, question_translated in zip(
+        data_learning["questions"], data_translated["questions"]
+    ):
         answers = []
-        for answer in question["options"]:
-            is_correct = answer == question["answer"]
+        for answer_learning, answer_translated in zip(
+            question_learning["options"], question_translated["options"]
+        ):
+            is_correct = answer_learning == question_learning["answer"]
             answers.append(
-                VocabularyAnswerCreate(answer_text=answer, is_correct=is_correct)
+                VocabularyAnswerCreate(
+                    answer_text=answer_learning,
+                    is_correct=is_correct,
+                    translation=answer_translated,
+                )
             )
 
         questions.append(
             VocabularyQuestionCreate(
-                question_text=question["question"], answers=answers
+                question_text=question_learning["question"],
+                answers=answers,
+                translation=question_translated["question"],
             )
         )
 
     return VocabularyPromptCreate(
-        prompt=data["lesson"],
+        prompt=data_learning["lesson"],
         category=category,
         questions=questions,
-        language=language,
-    )
-
-
-def generate_data() -> VocabularyPromptCreate:
-    answers = [
-        VocabularyAnswerCreate(answer_text="1", is_correct=False),
-        VocabularyAnswerCreate(answer_text="2", is_correct=False),
-        VocabularyAnswerCreate(answer_text="3", is_correct=False),
-        VocabularyAnswerCreate(answer_text="4", is_correct=True),
-    ]
-    question = VocabularyQuestionCreate(question_text="ABCDEFGH?", answers=answers)
-    return VocabularyPromptCreate(
-        prompt="this is sample prompt 2",
-        category="movie",
-        questions=[question],
-        language="english",
+        learning_language=learning_language,
+        translated_language=translated_language,
+        translation=data_translated["lesson"],
     )
 
 
 @router.get("/")
 async def get(*, db: Session = Depends(get_db)) -> dict[str, Any]:
-    abc = CRUDVocabularyPrompt(VocabularyPrompt)
-    abc.create_with_category(db, generate_data(), "facebook|4152771494955357")
     return {"message": "successfully"}
 
 
@@ -84,15 +78,17 @@ async def get_new_vocabulary_questions(
 ) -> dict[str, Any]:
     questions: dict[str, Any] = ChatGPTVocabularyGenerator().generateVocabularyQuestion(
         category=user_input.category,
-        primary_language=user_input.primary_language,
+        translated_language=user_input.translated_language,
         learning_language=user_input.learning_language,
         num_questions=user_input.num_questions,
         num_answers=user_input.num_answers,
     )
 
-    # primary_language_object = _parse_json_prompt(user_input.category, user_input.primary_language, questions)
     learning_language_object = _parse_json_prompt(
-        user_input.category, user_input.learning_language, questions
+        user_input.category,
+        user_input.learning_language,
+        user_input.translated_language,
+        questions,
     )
     CRUDVocabularyPrompt(VocabularyPromptCreate).create_with_category(
         db, learning_language_object, auth.id
