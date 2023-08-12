@@ -2,11 +2,15 @@ import logging
 from contextlib import AbstractContextManager, contextmanager
 from typing import Callable
 
-from sqlalchemy import create_engine, orm
+from sqlalchemy import create_engine, create_mock_engine, orm
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
 Base = declarative_base()
+
+
+def dump(sql, *multiparams, **params):  # type: ignore
+    print()
 
 
 class Database:
@@ -14,7 +18,13 @@ class Database:
         self.logger = logging.getLogger(
             f"{__name__}.{self.__class__.__name__}",
         )
-        self._engine = create_engine(db_url, echo=True)
+
+        self._engine = (
+            create_engine(db_url, echo=True)
+            if db_url
+            else create_mock_engine("postgresql+psycopg2://", dump)
+        )
+
         self._session_factory = orm.scoped_session(
             orm.sessionmaker(
                 autocommit=False,
