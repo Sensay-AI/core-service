@@ -2,18 +2,19 @@ import os
 from unittest import mock
 
 import pytest
+from fastapi.testclient import TestClient
+
 from app.infrastructure.auth0.auth0 import Auth0Service
 from app.infrastructure.aws.s3 import S3Service
 from app.main import app
 from app.schemas.users import Auth0User
-from fastapi.testclient import TestClient
 
 APPLICATION_JSON = "application/json"
 
 
-@pytest.fixture
+@pytest.fixture()
 def client():
-    yield TestClient(app)
+    return TestClient(app)
 
 
 def test_upload_image(client):
@@ -21,7 +22,9 @@ def test_upload_image(client):
     s3_service_mock.upload_file.return_value = "http://s3.image.jng"
 
     auth_service_mock = mock.Mock(spec=Auth0Service)
-    auth_service_mock.verify_token.return_value = Auth0User(sub="user123", permissions=["read", "write"])
+    auth_service_mock.verify_token.return_value = Auth0User(
+        sub="user123", permissions=["read", "write"]
+    )
 
     app.container.s3_service.override(s3_service_mock)
     app.container.auth.override(auth_service_mock)
@@ -36,7 +39,7 @@ def test_upload_image(client):
             headers={
                 "Accept": APPLICATION_JSON,
                 "Authorization": "Bearer xyz",
-            }
+            },
         )
 
     assert response.status_code == 200

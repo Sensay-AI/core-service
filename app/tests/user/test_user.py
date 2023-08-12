@@ -2,22 +2,19 @@ from http import HTTPStatus
 from unittest import mock
 
 import pytest
-import pytest_asyncio
-from app.infrastructure.auth0.auth0 import Auth0Service
-from httpx import AsyncClient
+from fastapi.testclient import TestClient
 
+from app.infrastructure.auth0.auth0 import Auth0Service
 from app.main import app
 from app.repositories.user_repository import UserRepository
-from app.routes.api_v1.endpoints.auth import check_user
 from app.schemas.users import Auth0User
-from fastapi.testclient import TestClient
 
 APPLICATION_JSON = "application/json"
 
 
-@pytest.fixture
+@pytest.fixture()
 def client():
-    yield TestClient(app)
+    return TestClient(app)
 
 
 def test_get_user_info_without_token(client):
@@ -32,7 +29,9 @@ def test_get_user_info_without_token(client):
 
 def test_get_user_info(client):
     auth_service_mock = mock.Mock(spec=Auth0Service)
-    auth_service_mock.verify_token.return_value = Auth0User(sub="user123", permissions=["read", "write"])
+    auth_service_mock.verify_token.return_value = Auth0User(
+        sub="user123", permissions=["read", "write"]
+    )
     app.container.auth.override(auth_service_mock)
 
     repository_mock = mock.AsyncMock(spec=UserRepository)
@@ -51,7 +50,9 @@ def test_get_user_info(client):
 
 def test_create_user(client):
     auth_service_mock = mock.Mock(spec=Auth0Service)
-    auth_service_mock.verify_token.return_value = Auth0User(sub="user123", permissions=["read", "write"])
+    auth_service_mock.verify_token.return_value = Auth0User(
+        sub="user123", permissions=["read", "write"]
+    )
     app.container.auth.override(auth_service_mock)
 
     repository_mock = mock.AsyncMock(spec=UserRepository)
