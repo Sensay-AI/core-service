@@ -3,31 +3,25 @@ from unittest import mock
 
 import pytest
 import pytest_asyncio
+from app.infrastructure.auth0.auth0 import Auth0Service
 from httpx import AsyncClient
 
 from app.main import app
 from app.repositories.user_repository import UserRepository
 from app.routes.api_v1.endpoints.auth import check_user
 from app.schemas.users import Auth0User
+from fastapi.testclient import TestClient
 
 APPLICATION_JSON = "application/json"
 
 
-@pytest_asyncio.fixture
-async def client():
-    app.dependency_overrides[check_user] = override_dependency
-    async with AsyncClient(app=app, base_url="http://test") as testClient:
-        yield testClient
+@pytest.fixture
+def client():
+    yield TestClient(app)
 
 
-async def override_dependency():
-    return Auth0User(sub="user1234", permissions=["read", "write"])
-
-
-@pytest.mark.asyncio()
-async def test_get_user_info_without_token(client):
-    app.dependency_overrides[check_user] = check_user
-    response = await client.get(
+def test_get_user_info_without_token(client):
+    response = client.get(
         "/api/v1/user/",
         headers={
             "Accept": APPLICATION_JSON,
@@ -36,14 +30,16 @@ async def test_get_user_info_without_token(client):
     assert response.status_code == HTTPStatus.FORBIDDEN
 
 
-@pytest.mark.asyncio()
-async def test_get_user_info(client):
-    app.dependency_overrides[check_user] = override_dependency
+def test_get_user_info(client):
+    auth_service_mock = mock.Mock(spec=Auth0Service)
+    auth_service_mock.verify_token.return_value = Auth0User(sub="user123", permissions=["read", "write"])
+    app.container.auth.override(auth_service_mock)
+
     repository_mock = mock.AsyncMock(spec=UserRepository)
     repository_mock.get_by_id.return_value = ""
 
     with app.container.user_repository.override(repository_mock):
-        response = await client.get(
+        response = client.get(
             "/api/v1/user/",
             headers={
                 "Accept": APPLICATION_JSON,
@@ -53,15 +49,16 @@ async def test_get_user_info(client):
     assert response.status_code == HTTPStatus.OK
 
 
-@pytest.mark.asyncio()
-async def test_create_user(client):
-    app.dependency_overrides[check_user] = override_dependency
+def test_create_user(client):
+    auth_service_mock = mock.Mock(spec=Auth0Service)
+    auth_service_mock.verify_token.return_value = Auth0User(sub="user123", permissions=["read", "write"])
+    app.container.auth.override(auth_service_mock)
 
     repository_mock = mock.AsyncMock(spec=UserRepository)
     repository_mock.add.return_value = ""
 
     with app.container.user_repository.override(repository_mock):
-        resp = await client.post(
+        resp = client.post(
             "/api/v1/user/create",
             headers={
                 "Accept": APPLICATION_JSON,
