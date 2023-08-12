@@ -78,4 +78,4 @@ class Container(containers.DeclarativeContainer):
         s3_client=s3_client,
     )
 
-    s3_image_bucket = providers.Factory(config.infrastructures.aws.s3_image_bucket)
+    s3_image_bucket = providers.Resource(config.infrastructures.aws.s3_image_bucket)

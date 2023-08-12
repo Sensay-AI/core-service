@@ -2,6 +2,7 @@ from http import HTTPStatus
 from unittest import mock
 
 import pytest
+from dependency_injector import providers
 from fastapi.testclient import TestClient
 
 from app.infrastructure.auth0.auth0 import Auth0Service
@@ -12,8 +13,38 @@ from app.schemas.users import Auth0User
 APPLICATION_JSON = "application/json"
 
 
+class StsClientStub:
+    pass
+
+
+class TempCredentialsStub:
+    pass
+
+
+class SessionStub:
+    pass
+
+
+class S3ClientStub:
+    pass
+
+
+class S3ServiceStub:
+    pass
+
+
+class S3ImageBucket:
+    pass
+
+
 @pytest.fixture()
 def client():
+    app.container.sts_client.override(providers.Resource(StsClientStub))
+    app.container.temp_credentials.override(providers.Resource(TempCredentialsStub))
+    app.container.session.override(providers.Resource(SessionStub))
+    app.container.s3_client.override(providers.Resource(S3ClientStub))
+    app.container.s3_service.override(providers.Factory(S3ServiceStub))
+    app.container.s3_image_bucket.override(providers.Resource(S3ImageBucket))
     return TestClient(app)
 
 
