@@ -59,6 +59,10 @@ jobs:
           poetry run make lint-check
 
       - name: Run Tests
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
           echo "Running the tests..."
-          cd app && poetry run pytest -v -s
+          poetry run pytest -v -s
