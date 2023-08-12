@@ -26,7 +26,11 @@ dependencies = [
     "sqlalchemy",
     "psycopg2-binary",
     "PyJWT",
-    "singleton-decorator"
+    "singleton-decorator",
+    "langchain",
+    "openai",
+    "tiktoken",
+    "jinja2"
 ]
 
 [project.optional-dependencies]
