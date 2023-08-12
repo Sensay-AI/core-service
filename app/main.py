@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response, Request
+from fastapi import FastAPI, Request, Response
 from starlette.middleware.cors import CORSMiddleware
 
 from app.container.containers import Container
@@ -7,12 +7,11 @@ from app.routes.api_v1 import api as api_v1
 API_V1_STR = "/api/v1"
 
 
-async def catch_exceptions_middleware(request: Request, call_next):
+async def catch_exceptions_middleware(request: Request, call_next):  # type: ignore
     try:
         return await call_next(request)
     except Exception as e:
-        # you probably want some kind of logging here
-        print(e)
+        print("Exception: ", e)
         return Response("Internal server error", status_code=500)
 
 
@@ -34,7 +33,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    fast_api_app.middleware('http')(catch_exceptions_middleware)
+    fast_api_app.middleware("http")(catch_exceptions_middleware)
 
     return fast_api_app
 
