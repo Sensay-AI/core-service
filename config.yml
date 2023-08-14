@@ -1,12 +1,29 @@
+core:
+  app:
+    env: ${ENV_NAME:"local"}
+    logger:
+      config_file:
+        production: "logging_production.ini"
+        development: "logging_development.ini"
+        local: "logging_development.ini"
+
 infrastructures:
   aws:
-    access_key_id: ""
-    secret_access_key: ""
-    s3_image_bucket: "sensayai-images"
+    access_key_id: ${AWS_ACCESS_KEY_ID}
+    secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+    s3_image_bucket:
+      production: "sensayai-images"
+      development: "sensayai-images-dev"
+      local: "sensayai-images-local"
   db:
-    url: ""
+    url: ${DB_URL}
   auth0:
     domain: "dev-kpookvh6nj230wwk.us.auth0.com"
     audience: "https://dev-kpookvh6nj230wwk.us.auth0.com/api/v2/"
     issuer: "https://dev-kpookvh6nj230wwk.us.auth0.com/"
     algorithms: "RS256"
+  sentry:
+    dsn:
+      production: "https://c14bcbd567f0f64f03ed68a924308377@o4505696978468864.ingest.sentry.io/4505696980303872"
+      development: "https://c14bcbd567f0f64f03ed68a924308377@o4505696978468864.ingest.sentry.io/4505696980303872"
+      local: ""
