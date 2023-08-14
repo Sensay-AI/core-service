@@ -22,6 +22,13 @@ in the production env please add that in the [tool.poetry.group.dev.dependencies
     ```bash
         poetry add black -D
     ```
+   - NOTE!!: Eveytime         
+ you make the update to the dependency pyproject.toml file
+please also update the poetry.lock as well (if it not updates yet) by running
+    ```bash
+   poetry lock --no-update
+    ```
+ref: https://stackoverflow.com/questions/58961497/how-to-update-poetrys-lock-file-without-upgrading-dependencies
 
 3. Next step
 
@@ -52,7 +59,7 @@ in the production env please add that in the [tool.poetry.group.dev.dependencies
     ```shell
     poetry run uvicorn app.main:app --port 5000 --reload
     ```
-   
+
 ## Dependency injection and inversion of control
 If you still not familiar with this concept please do some research,
 here is some good resources: https://python-dependency-injector.ets-labs.org/introduction/di_in_python.html, https://www.youtube.com/watch?v=J1f5b4vcxCQ&ab_channel=CodeAesthetic
@@ -70,3 +77,25 @@ to integration level test (put some part of code together).
 
 So please do test on the code you wrote, integration test is a must for delivering an API.
 For other part external part of the system like Auth0, DB, AWS,... you don't have to test that.
+
+
+## Configuration
+
+We will use  [config.yml](./config.yml) to set some of the configuration variable for our project.
+Some important note!!: 
+- For some config like this ${AWS_ACCESS_KEY_ID}, ${ENV_NAME},... meaning they are the 
+environment variable in your local machine, or they can be set in the run time of the application,...
+please refer to this to update on those setting on MacOS, Window, Ubuntu..
+- ${ENV_NAME:"local"} meaning the it will look for your env if not it get default as "local" 
+- For ${AWS_SECRET_ACCESS_KEY} please read this https://docs.aws.amazon.com/powershell/latest/userguide/pstools-appendix-sign-up.html
+- Some section in the yaml file have the structure like this:
+```yaml
+    s3_image_bucket:
+      production: "sensayai-images"
+      development: "sensayai-images-dev"
+      local: "sensayai-images-local"
+```
+meaning they can switch-variant base on the ENV_NAME you currently running, 
+so if you want you can update those section to update the variable for 
+the environment you want to run the application on
+- reference: https://python-dependency-injector.ets-labs.org/providers/configuration.html
