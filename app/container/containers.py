@@ -3,6 +3,7 @@
 import logging.config
 
 import boto3
+import sentry_sdk
 from botocore.client import BaseClient
 from dependency_injector import containers, providers
 from dependency_injector.providers import Resource
@@ -12,7 +13,6 @@ from app.infrastructure.aws.s3 import S3Service
 from app.infrastructure.db.database import Database
 from app.repositories.user_repository import UserRepository
 from app.services.user_service import UserService
-import sentry_sdk
 
 
 class Container(containers.DeclarativeContainer):
@@ -33,7 +33,7 @@ class Container(containers.DeclarativeContainer):
         fname=config.core.app.logger.config_file[env_name],
     )
 
-    sentry_sdk = providers.Resource(
+    sentry_sdk = providers.Resource(  # type: ignore [var-annotated]
         sentry_sdk.init,
         dsn=config.infrastructures.sentry.dsn[env_name],
         # TODO: traces_sample_rate may have to update when the app up and running on prod
@@ -89,4 +89,6 @@ class Container(containers.DeclarativeContainer):
         s3_client=s3_client,
     )
 
-    s3_image_bucket = providers.Resource(config.infrastructures.aws.s3_image_bucket[env_name])
+    s3_image_bucket = providers.Resource(
+        config.infrastructures.aws.s3_image_bucket[env_name]
+    )

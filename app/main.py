@@ -1,12 +1,12 @@
 import logging
+import time
 
 from fastapi import FastAPI, Request, Response
+from sentry_sdk import capture_exception
 from starlette.middleware.cors import CORSMiddleware
 
 from app.container.containers import Container
 from app.routes.api_v1 import api as api_v1
-import time
-from sentry_sdk import capture_exception
 
 logger = logging.getLogger()
 API_V1_STR = "/api/v1"
