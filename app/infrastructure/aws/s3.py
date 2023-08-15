@@ -43,6 +43,14 @@ class S3Service:
         )
         return self.create_pre_signed_url(bucket_name, upload_path)
 
+    def get_file(self, file_path: str, bucket_name: str) -> dict:
+        try:
+            obj = self.s3_client.get_object(Bucket=bucket_name, Key=file_path)
+        except ClientError as e:
+            self.logger.error(e, exc_info=True)
+            return {}
+        return obj
+
     def create_pre_signed_url(
         self, bucket_name: str, object_name: str, expiration: int = 3600
     ) -> str | None:

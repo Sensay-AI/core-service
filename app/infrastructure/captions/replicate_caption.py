@@ -10,17 +10,15 @@ from app.utils.utils import logger
 
 @singleton
 class CaptionGenerator:
-    def __init__(self) -> None:
-        self.mplug_model_id = config.IMAGE_CAPTIONING_MODEL
-        self.replicate_generator = replicate.Client(
-            api_token=config.REPLICATE_API_TOKEN
-        )
+    def __init__(self, model_id, caption_client) -> None:
+        self.model_id = model_id
+        self.caption_client = replicate.Client(api_token=config.REPLICATE_API_TOKEN)
 
     def generate_from_image(self, prompt: str, image_file: BytesIO) -> str:
         caption = []
         try:
-            output = self.replicate_generator.run(
-                self.mplug_model_id, input={"prompt": prompt, "img": image_file}
+            output = self.caption_client.run(
+                self.model_id, input={"prompt": prompt, "img": image_file}
             )
 
             for word in output:

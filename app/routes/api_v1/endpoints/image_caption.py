@@ -2,18 +2,20 @@ from http import HTTPStatus
 from io import BytesIO
 from typing import Dict
 
+from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.aws.s3 import S3Image
 from app.captions.replicate_caption import CaptionGenerator
 from app.chatgpt.chatgpt_requests import rewrite_caption_in_language
-from app.core import config
+from app.container.containers import Container
 from app.core.auth0 import check_user
 from app.db.database import get_db
+from app.infrastructure.aws.s3 import S3Service
 from app.models.image_caption import ImageCaption, ImageCaptionRequest
-from app.models.users import UserInfo
+from app.repositories.user_repository import UserNotFoundError
 from app.schemas.users import Auth0User
+from app.services.user_service import UserService
 
 router = APIRouter()
 
@@ -23,18 +25,23 @@ def generate_caption(
     input_data: ImageCaptionRequest,
     db: Session = Depends(get_db),
     auth: Auth0User = Depends(check_user),
+    user_service: UserService = Depends(Provide[Container.user_service]),
+    s3_service: S3Service = Depends(Provide[Container.s3_service]),
+    caption_service: CaptionGenerator = Depends(Provide[Container.caption_service]),
 ) -> Dict[str, str]:
     language = input_data.language
     image_url = input_data.image_url
     user_id = auth.id
-    user_exist = db.query(UserInfo).filter(UserInfo.user_id == user_id).first()
-    if not user_exist:
+    try:
+        user_service.get_by_id(user_id)
+    except UserNotFoundError:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="The user id provided does not exist!",
         )
-    image_file = S3Image().s3_client.get_file(
-        file_path=image_url, bucket_name=config.S3_IMAGE_BUCKET
+    image_file = s3_service.get_file(
+        file_path=image_url,
+        bucket_name=Container.config.infrastructures.aws.s3_image_bucket,
     )
     if image_file:
         image_file = image_file["Body"].read()
@@ -44,7 +51,7 @@ def generate_caption(
             detail="The image does not exist",
         )
     image_file = BytesIO(image_file)
-    caption = CaptionGenerator().generate_from_image(
+    caption = caption_service.generate_from_image(
         prompt="Generate a caption for the following image", image_file=image_file
     )
     if not caption:

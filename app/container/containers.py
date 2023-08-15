@@ -7,9 +7,11 @@ import sentry_sdk
 from botocore.client import BaseClient
 from dependency_injector import containers, providers
 from dependency_injector.providers import Resource
+from replicate import Client
 
 from app.infrastructure.auth0.auth0 import Auth0Service
 from app.infrastructure.aws.s3 import S3Service
+from app.infrastructure.captions.replicate_caption import CaptionGenerator
 from app.infrastructure.db.database import Database
 from app.repositories.user_repository import UserRepository
 from app.services.user_service import UserService
@@ -91,4 +93,12 @@ class Container(containers.DeclarativeContainer):
 
     s3_image_bucket = providers.Resource(
         config.infrastructures.aws.s3_image_bucket[env_name]
+    )
+
+    caption_client = providers.Resource(Client, api_token=config.replicate.access_token)
+
+    caption_service = providers.Factory(
+        CaptionGenerator,
+        model_id=config.replicate.model_id,
+        caption_client=caption_client,
     )

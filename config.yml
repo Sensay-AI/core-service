@@ -15,6 +15,10 @@ infrastructures:
       production: "sensayai-images"
       development: "sensayai-images-dev"
       local: "sensayai-images-local"
+  caption:
+    replicate:
+      access_token: ${REPLICATE_TOKEN}
+      model_id: "joehoover/mplug-owl:51a43c9d00dfd92276b2511b509fcb3ad82e221f6a9e5806c54e69803e291d6b"
   db:
     url: ${DB_URL}
   auth0:
