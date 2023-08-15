@@ -22,16 +22,6 @@ dependencies = [
     "python-multipart",
     "uvicorn",
     "gunicorn",
-    "python-jose[cryptography]",
-    "sqlalchemy",
-    "psycopg2-binary",
-    "PyJWT",
-    "singleton-decorator",
-    "langchain",
-    "openai",
-    "tiktoken",
-    "jinja2",
-    "alembic"
 ]
 
 [project.optional-dependencies]
@@ -145,6 +135,9 @@ boto3-type-annotations-with-docs = "^0.3.1"
 dependency-injector = "^4.41.0"
 pyyaml = "^6.0.1"
 sentry-sdk = { version = "*", extras = ["fastapi"] }
+langchain = "^0.0.265"
+tiktoken = "^0.4.0"
+jinja2 = "^3.1.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
@@ -156,6 +149,7 @@ ruff = "^0.0.284"
 pytest = "^7.3.2"
 requests = "^2.31.0"
 pytest-asyncio = "^0.21.1"
+alembic = "^1.11.2"
 
 [build-system]
 requires = ["poetry-core"]

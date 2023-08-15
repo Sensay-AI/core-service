@@ -4,7 +4,7 @@ from sqlalchemy import (
     String,
 )
 
-from app.db.database import Base
+from app.infrastructure.db.database import Base
 
 
 class Language(Base):

@@ -5,19 +5,10 @@ from http import HTTPStatus
 from typing import Any
 
 from fastapi import HTTPException
-from langchain import PromptTemplate
-from langchain.llms import OpenAI
-from singleton_decorator import singleton
-
-from app.core.config import OPEN_API_KEY
-
-LOG = logging.getLogger(__name__)
+from langchain import OpenAI, PromptTemplate
 
 
-@singleton
-class ChatGPTVocabularyGenerator(object):
-    _model = OpenAI(openai_api_key=OPEN_API_KEY, max_tokens=-1, temperature=0.5)
-
+class ChatGPTVocabularyGenerator:
     _vocabulary_format = """{
                 "lesson": "<prompt of lesson without a newline>",
                 "questions": [
@@ -41,10 +32,11 @@ class ChatGPTVocabularyGenerator(object):
             }
         """
 
-    def __int__(self) -> Any:
-        pass
+    def __init__(self, model: OpenAI):
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.model = model
 
-    def generateVocabularyQuestion(
+    def generate_vocabulary_questions(
         self,
         category: str,
         translated_language: str,
@@ -66,13 +58,12 @@ class ChatGPTVocabularyGenerator(object):
                 num_answers=num_answers,
                 format_output=self._vocabulary_format,
             )
-            LOG.debug(f"[Vocabulary] Prompt: {prompt}")
-
-            response = self._model.predict(prompt)
+            self.logger.debug(f"Prompt: {prompt}")
+            response = self.model.predict(prompt)
             response = response.replace("\\n", " ")
             response = response.replace("\n", " ")
-            LOG.debug(f"[Vocabulary] Execution time: {datetime.now() - start}")
-            LOG.debug(f"[Vocabulary] Response: {prompt}")
+            self.logger.debug(f"Execution time: {datetime.now() - start}")
+            self.logger.debug(f"Response: {prompt}")
             return json.loads(response)
         except Exception as e:
             raise HTTPException(

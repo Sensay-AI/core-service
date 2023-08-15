@@ -1,14 +1,15 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from app.core.config import POSTGRESQL_URI
-from app.db.database import Base
+from app.infrastructure.db.database import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+POSTGRESQL_URI = os.getenv("DB_URL")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

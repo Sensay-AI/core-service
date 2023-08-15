@@ -10,7 +10,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from app.db.database import Base
+from app.infrastructure.db.database import Base
 
 
 class Category(Base):
@@ -113,20 +113,3 @@ class VocabularyAnswerTranslation(Base):
     answer_id = Column(Integer, ForeignKey("vocabulary_answers.id"), nullable=False)
     answer = relationship("VocabularyAnswer", back_populates="translations")
     translated_language = relationship("Language")
-
-
-# class TranslationMapping(Base):
-#     __tablename__ = "mapping_translation_texts"
-#     id = Column(Integer, primary_key=True)
-#     learning_prompt_id = Column(
-#         Integer, ForeignKey("vocabulary_prompts.id"), nullable=False
-#     )
-#     translated_prompt_id = Column(
-#         Integer, ForeignKey("vocabulary_prompts.id"), nullable=False
-#     )
-#     learning_prompt = relationship(
-#         "VocabularyPrompt", foreign_keys=[learning_prompt_id]
-#     )
-#     translated_prompt = relationship(
-#         "VocabularyPrompt", foreign_keys=[translated_prompt_id]
-#     )

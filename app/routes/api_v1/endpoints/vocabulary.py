@@ -1,17 +1,14 @@
-from __future__ import annotations
-
 from typing import Any
 
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 
-from app.core.auth0 import check_user
-from app.crud.crud_vocabulary import CRUDVocabularyPrompt
-from app.db.database import get_db
-from app.llm.vocabulary import ChatGPTVocabularyGenerator
-from app.models.vocabulary import (
-    Category,
-)
+from app.container.containers import Container
+from app.infrastructure.llm.vocabulary import ChatGPTVocabularyGenerator
+from app.models.vocabulary import Category
+from app.repositories.base_repository import BaseRepository
+from app.repositories.vocabulary_repository import VocabularyRepository
+from app.routes.api_v1.endpoints.auth import check_user
 from app.schemas.users import Auth0User
 from app.schemas.vocabulary import (
     GetVocabularyHistoryQuestion,
@@ -64,19 +61,18 @@ def _parse_json_prompt(
     )
 
 
-@router.get("/")
-async def get(*, db: Session = Depends(get_db)) -> dict[str, Any]:
-    return {"message": "successfully"}
-
-
 @router.post("/questions")
+@inject
 async def get_new_vocabulary_questions(
     *,
     user_input: GetVocabularyQuestions,
-    db: Session = Depends(get_db),
+    voca_generator: ChatGPTVocabularyGenerator = Depends(
+        Provide[Container.chatGPT_vocabulary_generator]
+    ),
+    repo: VocabularyRepository = Depends(Provide[Container.vocabulary_repository]),
     auth: Auth0User = Depends(check_user),
 ) -> dict[str, Any]:
-    questions: dict[str, Any] = ChatGPTVocabularyGenerator().generateVocabularyQuestion(
+    questions: dict[str, Any] = voca_generator.generate_vocabulary_questions(
         category=user_input.category,
         translated_language=user_input.translated_language,
         learning_language=user_input.learning_language,
@@ -90,29 +86,30 @@ async def get_new_vocabulary_questions(
         user_input.translated_language,
         questions,
     )
-    CRUDVocabularyPrompt(VocabularyPromptCreate).create_with_category(
-        db, learning_language_object, auth.id
-    )
+    repo.create_with_category(learning_language_object, auth.id)
     return {"items": questions}
 
 
 @router.get("/category")
+@inject
 async def get_user_categories(
-    *, db: Session = Depends(get_db), auth: Auth0User = Depends(check_user)
+    *,
+    repo: BaseRepository = Depends(Provide[Container.category_repository]),
+    auth: Auth0User = Depends(check_user),
 ) -> dict[str, Any]:
-    categories = db.query(Category).filter(Category.user_id == auth.id).limit(100).all()
-    categories = [category.__dict__ for category in categories]
-    return {"items": categories}
+    categories = repo.query(Category.user_id == auth.id)
+    items = []
+    if categories:
+        items = [category.__dict__ for category in categories]
+    return {"items": items}
 
 
 @router.post("/category/history/questions")
+@inject
 async def get_history_question_by_category(
-    *,
-    db: Session = Depends(get_db),
     input: GetVocabularyHistoryQuestion,
+    repo: VocabularyRepository = Depends(Provide[Container.vocabulary_repository]),
     auth: Auth0User = Depends(check_user),
 ) -> dict[str, Any]:
-    prompts = CRUDVocabularyPrompt(VocabularyPromptCreate).get_history_questions(
-        db, input, auth.id
-    )
+    prompts = repo.get_history_questions(input, auth.id)
     return {"items": prompts}
