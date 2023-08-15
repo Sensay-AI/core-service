@@ -12,6 +12,10 @@ from sqlalchemy.orm import relationship
 
 from app.infrastructure.db.database import Base
 
+FOREIGN_LANGUAGE_ID = "languages.id"
+FOREIGN_VOCA_QUESTION_ID = "vocabulary_questions.id"
+FOREIGN_VOCA_ANSWER_ID = "vocabulary_answers.id"
+
 
 class Category(Base):
     __tablename__ = "category"
@@ -37,7 +41,7 @@ class VocabularyPrompt(Base):
     is_valid = Column(Boolean, default=True)
 
     category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
-    language_id = Column(Integer, ForeignKey("languages.id"), nullable=False)
+    language_id = Column(Integer, ForeignKey(FOREIGN_LANGUAGE_ID), nullable=False)
     language = relationship("Language")
     questions = relationship("VocabularyQuestion", back_populates="prompt")
     category = relationship("Category", back_populates="prompts")
@@ -55,7 +59,7 @@ class VocabularyQuestion(Base):
     answers = relationship("VocabularyAnswer", back_populates="question")
     prompt = relationship("VocabularyPrompt", back_populates="questions")
     prompt_id = Column(Integer, ForeignKey("vocabulary_prompts.id"), nullable=False)
-    language_id = Column(Integer, ForeignKey("languages.id"), nullable=False)
+    language_id = Column(Integer, ForeignKey(FOREIGN_LANGUAGE_ID), nullable=False)
     translations = relationship(
         "VocabularyQuestionTranslation", back_populates="question"
     )
@@ -69,8 +73,8 @@ class VocabularyAnswer(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    question_id = Column(Integer, ForeignKey("vocabulary_questions.id"), nullable=False)
-    language_id = Column(Integer, ForeignKey("languages.id"), nullable=False)
+    question_id = Column(Integer, ForeignKey(FOREIGN_VOCA_QUESTION_ID), nullable=False)
+    language_id = Column(Integer, ForeignKey(FOREIGN_LANGUAGE_ID), nullable=False)
     question = relationship("VocabularyQuestion", back_populates="answers")
     translations = relationship("VocabularyAnswerTranslation", back_populates="answer")
 
@@ -78,8 +82,8 @@ class VocabularyAnswer(Base):
 class ChoiceQuestionResponse(Base):
     __tablename__ = "choice_question_response"
     id = Column(Integer, primary_key=True)
-    question_id = Column(Integer, ForeignKey("vocabulary_questions.id"))
-    answer_selected_id = Column(Integer, ForeignKey("vocabulary_answers.id"))
+    question_id = Column(Integer, ForeignKey(FOREIGN_VOCA_QUESTION_ID))
+    answer_selected_id = Column(Integer, ForeignKey(FOREIGN_VOCA_ANSWER_ID))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user_id = Column(Integer, ForeignKey("user_info.id"))
@@ -88,7 +92,9 @@ class ChoiceQuestionResponse(Base):
 class VocabularyPromptTranslation(Base):
     __tablename__ = "vocabulary_prompt_translations"
     id = Column(Integer, primary_key=True)
-    translated_language_id = Column(Integer, ForeignKey("languages.id"), nullable=False)
+    translated_language_id = Column(
+        Integer, ForeignKey(FOREIGN_LANGUAGE_ID), nullable=False
+    )
     translated_text = Column(String)
     prompt_id = Column(Integer, ForeignKey("vocabulary_prompts.id"), nullable=False)
     prompt = relationship("VocabularyPrompt", back_populates="translations")
@@ -99,8 +105,10 @@ class VocabularyQuestionTranslation(Base):
     __tablename__ = "vocabulary_question_translations"
     id = Column(Integer, primary_key=True)
     translated_text = Column(String)
-    translated_language_id = Column(Integer, ForeignKey("languages.id"), nullable=False)
-    question_id = Column(Integer, ForeignKey("vocabulary_questions.id"), nullable=False)
+    translated_language_id = Column(
+        Integer, ForeignKey(FOREIGN_LANGUAGE_ID), nullable=False
+    )
+    question_id = Column(Integer, ForeignKey(FOREIGN_VOCA_QUESTION_ID), nullable=False)
     question = relationship("VocabularyQuestion", back_populates="translations")
     translated_language = relationship("Language")
 
@@ -109,7 +117,9 @@ class VocabularyAnswerTranslation(Base):
     __tablename__ = "vocabulary_answer_translations"
     id = Column(Integer, primary_key=True)
     translated_text = Column(String)
-    translated_language_id = Column(Integer, ForeignKey("languages.id"), nullable=False)
-    answer_id = Column(Integer, ForeignKey("vocabulary_answers.id"), nullable=False)
+    translated_language_id = Column(
+        Integer, ForeignKey(FOREIGN_LANGUAGE_ID), nullable=False
+    )
+    answer_id = Column(Integer, ForeignKey(FOREIGN_VOCA_ANSWER_ID), nullable=False)
     answer = relationship("VocabularyAnswer", back_populates="translations")
     translated_language = relationship("Language")
