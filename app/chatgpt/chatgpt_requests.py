@@ -20,11 +20,6 @@ def rewrite_caption_in_language(caption: str, language: str) -> str:
             messages=[{"role": "user", "content": prompt}],
         )
         response_message = response["choices"][0]["message"]["content"]
-<<<<<<< HEAD
-<<<<<<< HEAD
-    except Exception as error:
-        logger.error(f"Chatgpt Error {error}", exc_info=True)
-=======
     except openai.error.APIError as e:
         # Handle API error here, e.g. retry or log
         logger.error(f"OpenAI API returned an API Error: {e}", exc_info=True)
@@ -39,5 +34,4 @@ def rewrite_caption_in_language(caption: str, language: str) -> str:
         pass
     except Exception as e:
         logger.error(f"An error occurred: {e}")
->>>>>>> 934b397 (remove broad exceptions, use auth.id)
     return response_message

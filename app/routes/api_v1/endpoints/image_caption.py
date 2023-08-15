@@ -37,7 +37,6 @@ def generate_caption(
         file_path=image_url, bucket_name=config.S3_IMAGE_BUCKET
     )
     if image_file:
-
         image_file = image_file["Body"].read()
     else:
         raise HTTPException(
