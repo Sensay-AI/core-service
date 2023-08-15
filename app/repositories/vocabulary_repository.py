@@ -1,5 +1,6 @@
+from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any, List, Optional, Tuple, Type
+from typing import Any, List, Optional, Type
 
 from fastapi import HTTPException
 from sqlalchemy import and_
@@ -18,6 +19,12 @@ from app.models.vocabulary import (
 )
 from app.repositories.base_repository import BaseRepository
 from app.schemas.vocabulary import GetVocabularyHistoryQuestion, VocabularyPromptCreate
+
+
+@dataclass
+class QuestionWithAnswers:
+    questions: List[VocabularyQuestion]
+    answers: List[VocabularyAnswer]
 
 
 def check_language(db: Session, language_name: str) -> int:
@@ -40,7 +47,7 @@ def parse_question_answers(
     prompt_create: VocabularyPromptCreate,
     learning_language_id: int,
     translated_language_id: int,
-) -> Tuple[List[VocabularyQuestion], List[VocabularyAnswer]]:
+) -> QuestionWithAnswers:
     questions = []
     answers = []
 
@@ -72,7 +79,7 @@ def parse_question_answers(
             )
             answers.append(vocabulary_answer)
             answers.append(vocabulary_translated_answer)
-    return questions, answers
+    return QuestionWithAnswers(questions=questions, answers=answers)
 
 
 class VocabularyRepository(
@@ -118,15 +125,16 @@ class VocabularyRepository(
             session.add(prompt_obj)
             session.add(translated_prompt_obj)
 
-            questions, answers = parse_question_answers(
+            questions_with_answers = parse_question_answers(
                 prompt_obj, prompt_create, learning_language_id, translated_language_id
             )
-            session.add_all(questions)
-            session.add_all(answers)
+
+            session.add_all(questions_with_answers.questions)
+            session.add_all(questions_with_answers.answers)
             session.commit()
 
     def get_history_questions(
-        self, input: GetVocabularyHistoryQuestion, user_id: str
+        self, question_input: GetVocabularyHistoryQuestion, user_id: str
     ) -> list[Type[VocabularyPrompt]]:
         with self.session_factory() as session:
             prompts = (
@@ -147,13 +155,14 @@ class VocabularyRepository(
                 )
                 .filter(
                     and_(
-                        Category.id == input.category_id,
+                        Category.id == question_input.category_id,
                         Category.user_id == user_id,
-                        Language.language_name == input.learning_language.upper(),
+                        Language.language_name
+                        == question_input.learning_language.upper(),
                         VocabularyPrompt.is_valid,
                     )
                 )
-                .limit(input.limit_prompts)
+                .limit(question_input.limit_prompts)
                 .all()
             )
             return prompts
