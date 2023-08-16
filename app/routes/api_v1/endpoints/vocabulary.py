@@ -23,7 +23,7 @@ from app.schemas.vocabulary import (
 router = APIRouter()
 
 
-def _parse_json_prompt(
+def parse_json_prompt(
     category: str, learning_language: str, translated_language: str, data: dict
 ) -> VocabularyPromptCreate:
     questions = []
@@ -83,7 +83,7 @@ async def get_new_vocabulary_questions(
             num_answers=user_input.num_answers,
         )
 
-        learning_language_object = _parse_json_prompt(
+        learning_language_object = parse_json_prompt(
             user_input.category,
             user_input.learning_language,
             user_input.translated_language,
@@ -92,7 +92,7 @@ async def get_new_vocabulary_questions(
         repo.create_with_category(learning_language_object, auth.id)
         return {"items": questions}
     except Exception as e:
-        return HTTPException(status_code=10001, detail=e.__str__())
+        return HTTPException(status_code=10002, detail=e.__str__())
 
 
 @router.get("/category")

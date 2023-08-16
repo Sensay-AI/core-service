@@ -61,7 +61,7 @@ class ChatGPTVocabularyGenerator:
             response = response.replace("\\n", " ")
             response = response.replace("\n", " ")
             self.logger.debug(f"Execution time: {datetime.now() - start}")
-            self.logger.debug(f"Response: {prompt}")
+            self.logger.debug(f"Response: {response}")
             return json.loads(response)
         except ValueError as e:
             self.logger.error(e.__str__())
