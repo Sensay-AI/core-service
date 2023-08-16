@@ -73,7 +73,7 @@ async def get_new_vocabulary_questions(
     ),
     repo: VocabularyRepository = Depends(Provide[Container.vocabulary_repository]),
     auth: Auth0User = Depends(check_user),
-) -> dict[str, Any] | HTTPException:
+) -> object:
     try:
         questions: dict[str, Any] = voca_generator.generate_vocabulary_questions(
             category=user_input.category,
@@ -101,7 +101,7 @@ async def get_user_categories(
     *,
     repo: BaseRepository = Depends(Provide[Container.category_repository]),
     auth: Auth0User = Depends(check_user),
-) -> dict[str, Any] | HTTPException:
+) -> object:
     try:
         categories = repo.query(Category.user_id == auth.id)
         items = []
@@ -118,7 +118,7 @@ async def get_history_question_by_category(
     input: GetVocabularyHistoryQuestion,
     repo: VocabularyRepository = Depends(Provide[Container.vocabulary_repository]),
     auth: Auth0User = Depends(check_user),
-) -> dict[str, Any] | HTTPException:
+) -> object:
     try:
         prompts = repo.get_history_questions(input, auth.id)
         return {"items": prompts}
