@@ -1,10 +1,8 @@
 import json
 import logging
 from datetime import datetime
-from http import HTTPStatus
 from typing import Any
 
-from fastapi import HTTPException
 from langchain import OpenAI, PromptTemplate
 
 
@@ -65,8 +63,11 @@ class ChatGPTVocabularyGenerator:
             self.logger.debug(f"Execution time: {datetime.now() - start}")
             self.logger.debug(f"Response: {prompt}")
             return json.loads(response)
-        except Exception as e:
-            raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail=str(e),
-            )
+        except ValueError as e:
+            self.logger.error(e.__str__())
+            raise PromptParserException()
+
+
+class PromptParserException(Exception):
+    def __init__(self) -> None:
+        super().__init__("Can not parse prompt response to json!")

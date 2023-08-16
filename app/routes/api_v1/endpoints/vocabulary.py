@@ -1,10 +1,12 @@
 from typing import Any
 
 from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.container.containers import Container
-from app.infrastructure.llm.vocabulary import ChatGPTVocabularyGenerator
+from app.infrastructure.llm.vocabulary import (
+    ChatGPTVocabularyGenerator,
+)
 from app.models.vocabulary import Category
 from app.repositories.base_repository import BaseRepository
 from app.repositories.vocabulary_repository import VocabularyRepository
@@ -71,23 +73,26 @@ async def get_new_vocabulary_questions(
     ),
     repo: VocabularyRepository = Depends(Provide[Container.vocabulary_repository]),
     auth: Auth0User = Depends(check_user),
-) -> dict[str, Any]:
-    questions: dict[str, Any] = voca_generator.generate_vocabulary_questions(
-        category=user_input.category,
-        translated_language=user_input.translated_language,
-        learning_language=user_input.learning_language,
-        num_questions=user_input.num_questions,
-        num_answers=user_input.num_answers,
-    )
+) -> dict[str, Any] | HTTPException:
+    try:
+        questions: dict[str, Any] = voca_generator.generate_vocabulary_questions(
+            category=user_input.category,
+            translated_language=user_input.translated_language,
+            learning_language=user_input.learning_language,
+            num_questions=user_input.num_questions,
+            num_answers=user_input.num_answers,
+        )
 
-    learning_language_object = _parse_json_prompt(
-        user_input.category,
-        user_input.learning_language,
-        user_input.translated_language,
-        questions,
-    )
-    repo.create_with_category(learning_language_object, auth.id)
-    return {"items": questions}
+        learning_language_object = _parse_json_prompt(
+            user_input.category,
+            user_input.learning_language,
+            user_input.translated_language,
+            questions,
+        )
+        repo.create_with_category(learning_language_object, auth.id)
+        return {"items": questions}
+    except Exception as e:
+        return HTTPException(status_code=10001, detail=e.__str__())
 
 
 @router.get("/category")
@@ -96,12 +101,15 @@ async def get_user_categories(
     *,
     repo: BaseRepository = Depends(Provide[Container.category_repository]),
     auth: Auth0User = Depends(check_user),
-) -> dict[str, Any]:
-    categories = repo.query(Category.user_id == auth.id)
-    items = []
-    if categories:
-        items = [category.__dict__ for category in categories]
-    return {"items": items}
+) -> dict[str, Any] | HTTPException:
+    try:
+        categories = repo.query(Category.user_id == auth.id)
+        items = []
+        if categories:
+            items = [category.__dict__ for category in categories]
+        return {"items": items}
+    except Exception as e:
+        return HTTPException(status_code=10001, detail=e.__str__())
 
 
 @router.post("/category/history/questions")
@@ -110,6 +118,9 @@ async def get_history_question_by_category(
     input: GetVocabularyHistoryQuestion,
     repo: VocabularyRepository = Depends(Provide[Container.vocabulary_repository]),
     auth: Auth0User = Depends(check_user),
-) -> dict[str, Any]:
-    prompts = repo.get_history_questions(input, auth.id)
-    return {"items": prompts}
+) -> dict[str, Any] | HTTPException:
+    try:
+        prompts = repo.get_history_questions(input, auth.id)
+        return {"items": prompts}
+    except Exception as e:
+        return HTTPException(status_code=10001, detail=e.__str__())
