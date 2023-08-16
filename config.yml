@@ -27,3 +27,5 @@ infrastructures:
       production: "https://c14bcbd567f0f64f03ed68a924308377@o4505696978468864.ingest.sentry.io/4505696980303872"
       development: "https://c14bcbd567f0f64f03ed68a924308377@o4505696978468864.ingest.sentry.io/4505696980303872"
       local: ""
+  gcp:
+    google_credential_file: "${GOOGLE_CREDENTIAL_FILE}"
