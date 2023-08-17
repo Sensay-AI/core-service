@@ -28,39 +28,30 @@ def client():
 
 
 def mock_chat_gpt_response() -> str:
-    return """{ "lesson": "Let's learn about sports! Sports are physical activities that involve skill, competition, 
-    and often teamwork. They are a great way to stay active and have fun. There are many different types of sports, 
-    including team sports like soccer, basketball, and rugby, as well as individual sports like swimming, running, 
-    and cycling. Sports can be played for leisure or professionally, and they bring people from diverse backgrounds 
-    together to enjoy a shared passion.",
-        "questions": [
-        {
-        "Question": "What is the term used for a person who runs in a race?",
-        "Options": ["Swimmer", "Runner", "Cyclist", "Skater"],
-        "Answer": "Runner"
-        },
-        {
-        "Question": "Which sport involves hitting a shuttlecock over a net?",
-        "Options": ["Tennis", "Badminton", "Golf", "Volleyball"],
-        "Answer": "Badminton"
-        },
-        {
-        "Question": "In which sport can you score a touchdown?",
-        "Options": ["Football", "Basketball", "Baseball", "Hockey"],
-        "Answer": "Football"
-        },
-        {
-        "Question": "Which sport is also known as 'The Gentleman's Game'?",
-        "Options": ["Cricket", "Rugby", "Golf", "Squash"],
-        "Answer": "Cricket"
-        },
-        {
-        "Question": "What is the term used for the area where you play basketball?",
-        "Options": ["Court", "Field", "Rink", "Course"],
-        "Answer": "Court"
+    return """{ 
+        "english": { 
+            "lesson": "ABCD
+                       ABCD",
+                "questions": [
+                    {
+                    "Question": "What is the term used for a person who runs in a race?",
+                    "Options": ["Swimmer", "Runner", "Cyclist", "Skater"],
+                    "Answer": "Runner"
+                    },
+                ]
+                },
+        "vietnamese": {
+                    "lesson": "ABCD
+                               ABCD",
+                "questions": [
+                    {
+                    "Question": "What is the term used for a person who runs in a race?",
+                    "Options": ["Swimmer", "Runner", "Cyclist", "Skater"],
+                    "Answer": "Runner"
+                    },
+                ]
         }
-        ]
-        }
+    }
     """
 
 
