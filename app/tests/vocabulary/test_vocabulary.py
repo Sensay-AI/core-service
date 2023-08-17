@@ -32,7 +32,7 @@ def mock_chat_gpt_response() -> str:
     and often teamwork. They are a great way to stay active and have fun. There are many different types of sports, 
     including team sports like soccer, basketball, and rugby, as well as individual sports like swimming, running, 
     and cycling. Sports can be played for leisure or professionally, and they bring people from diverse backgrounds 
-    together to enjoy a shared passion."
+    together to enjoy a shared passion.",
         "questions": [
         {
         "Question": "What is the term used for a person who runs in a race?",
