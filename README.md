@@ -107,9 +107,11 @@ the environment you want to run the application on
 | Infrastructures  | This handles the external interaction like DB, GoogleSheet, Auth0, and etc. Within this project, library exposing data structure should be converted into the domain models | Yes          |
 | Services         | This should implement use cases using infrastructures & domain-models.                                                                                                      | Yes          |
 | Routes -Endpoint | This should include the code run an application and application specific logic like HTTP Endpoint or background workers                                                     | Yes          |
-| Schema           | This will define the Route (Controller) Input/ endpoint schema                                                                                                              | Yes          |
+| Schema           | This will define the Route (Controller) Input/ endpoint schema                                                                                                              | No           |
 | Container        | This will include the Dependency Injector Container to provide and wire up the dependency for the application                                                               | ---          |
 | Other tooling    | Other tool like Docker, Script, GithubAction, Alchemic, Poetry ... will set up along with this service as well to help set up the project and deployment                    | ---          |
+
+
 The image bellow show the overview of this architecture
 
 (The arrow meaning: Service <--- Model mean that Service layer will have the dependency from Model layer)
