@@ -8,13 +8,13 @@ from langchain import OpenAI
 from app.infrastructure.auth0.auth0 import Auth0Service
 from app.main import app
 from app.repositories.vocabulary_repository import VocabularyRepository
-from app.services.vocabulary_service import parse_json_prompt
 from app.schemas.users import Auth0User
 from app.schemas.vocabulary import (
     VocabularyAnswerCreate,
     VocabularyPromptCreate,
     VocabularyQuestionCreate,
 )
+from app.services.vocabulary_service import parse_json_prompt
 
 LEARNING_LANGUAGE = "english"
 TRANSLATED_LANGUAGE = "vietnamese"
