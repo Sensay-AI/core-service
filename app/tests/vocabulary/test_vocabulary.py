@@ -8,7 +8,7 @@ from langchain import OpenAI
 from app.infrastructure.auth0.auth0 import Auth0Service
 from app.main import app
 from app.repositories.vocabulary_repository import VocabularyRepository
-from app.routes.api_v1.endpoints.vocabulary import parse_json_prompt
+from app.services.vocabulary_service import parse_json_prompt
 from app.schemas.users import Auth0User
 from app.schemas.vocabulary import (
     VocabularyAnswerCreate,
