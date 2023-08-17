@@ -34,35 +34,23 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def query(self, query: Any, limit: int = 200) -> Optional[ModelType]:
         with self.session_factory() as session:
-            try:
-                return session.query(self.model).filter(query).limit(limit).all()
-            except SQLAlchemyError as err:
-                self.logger.error(err)
-            return None
+            return session.query(self.model).filter(query).limit(limit).all()
 
     def get_multi(self, *, skip: int = 0, limit: int = 100) -> List[ModelType]:
         with self.session_factory() as session:
-            try:
-                return session.query(self.model).offset(skip).limit(limit).all()
-            except SQLAlchemyError as err:
-                self.logger.error(err)
-            return []
+            return session.query(self.model).offset(skip).limit(limit).all()
 
     def create(
         self, *, obj_in: CreateSchemaType, commit: bool = True
     ) -> Optional[ModelType]:
         with self.session_factory() as session:
-            try:
-                obj_in_data = jsonable_encoder(obj_in)
-                db_obj = self.model(**obj_in_data)
-                session.add(db_obj)
-                if commit:
-                    session.commit()
-                    session.refresh(db_obj)
-                return db_obj
-            except SQLAlchemyError as err:
-                self.logger.error(err)
-            return None
+            obj_in_data = jsonable_encoder(obj_in)
+            db_obj = self.model(**obj_in_data)
+            session.add(db_obj)
+            if commit:
+                session.commit()
+                session.refresh(db_obj)
+            return db_obj
 
     def update(
         self,
@@ -80,24 +68,16 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             if field in update_data:
                 setattr(db_obj, field, update_data[field])
         with self.session_factory() as session:
-            try:
-                session.add(db_obj)
-                if commit:
-                    session.commit()
-                    session.refresh(db_obj)
-                return db_obj
-            except SQLAlchemyError as err:
-                self.logger.error(err)
-            return None
+            session.add(db_obj)
+            if commit:
+                session.commit()
+                session.refresh(db_obj)
+            return db_obj
 
     def remove(self, *, id: int, commit: bool = True) -> Optional[ModelType]:
         with self.session_factory() as session:
-            try:
-                obj = session.query(self.model).get(id)
-                session.delete(obj)
-                if commit:
-                    session.commit()
-                return obj
-            except SQLAlchemyError as err:
-                self.logger.error(err)
-            return None
+            obj = session.query(self.model).get(id)
+            session.delete(obj)
+            if commit:
+                session.commit()
+            return obj

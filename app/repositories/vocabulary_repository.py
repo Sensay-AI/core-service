@@ -5,7 +5,6 @@ from typing import Any, List, Optional, Type
 from fastapi import HTTPException
 from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.language import Language
@@ -92,88 +91,81 @@ class VocabularyRepository(
         user_id: str,
     ) -> None:
         with self.session_factory() as session:
-            try:
-                stmt = (
-                    insert(Category)
-                    .values(category_name=prompt_create.category, user_id=user_id)
-                    .on_conflict_do_update(
-                        index_elements=["category_name", "user_id"],
-                        set_={"category_name": prompt_create.category},
-                    )
-                    .returning(Category.id)
+            stmt = (
+                insert(Category)
+                .values(category_name=prompt_create.category, user_id=user_id)
+                .on_conflict_do_update(
+                    index_elements=["category_name", "user_id"],
+                    set_={"category_name": prompt_create.category},
                 )
-                result = session.execute(stmt)
-                insert_id = result.fetchone()[0]
+                .returning(Category.id)
+            )
+            result = session.execute(stmt)
+            insert_id = result.fetchone()[0]
 
-                learning_language_id = check_language(
-                    session, prompt_create.learning_language
-                )
-                translated_language_id = check_language(
-                    session, prompt_create.translated_language
-                )
+            learning_language_id = check_language(
+                session, prompt_create.learning_language
+            )
+            translated_language_id = check_language(
+                session, prompt_create.translated_language
+            )
 
-                prompt_obj = VocabularyPrompt(
-                    prompt=prompt_create.prompt,
-                    category_id=insert_id,
-                    language_id=learning_language_id,
-                )
+            prompt_obj = VocabularyPrompt(
+                prompt=prompt_create.prompt,
+                category_id=insert_id,
+                language_id=learning_language_id,
+            )
 
-                translated_prompt_obj = VocabularyPromptTranslation(
-                    translated_language_id=translated_language_id,
-                    translated_text=prompt_create.translation,
-                    prompt=prompt_obj,
-                )
+            translated_prompt_obj = VocabularyPromptTranslation(
+                translated_language_id=translated_language_id,
+                translated_text=prompt_create.translation,
+                prompt=prompt_obj,
+            )
 
-                session.add(prompt_obj)
-                session.add(translated_prompt_obj)
+            session.add(prompt_obj)
+            session.add(translated_prompt_obj)
 
-                questions_with_answers = parse_question_answers(
-                    prompt_obj,
-                    prompt_create,
-                    learning_language_id,
-                    translated_language_id,
-                )
+            questions_with_answers = parse_question_answers(
+                prompt_obj,
+                prompt_create,
+                learning_language_id,
+                translated_language_id,
+            )
 
-                session.add_all(questions_with_answers.questions)
-                session.add_all(questions_with_answers.answers)
-                session.commit()
-            except SQLAlchemyError as err:
-                self.logger.error(err)
+            session.add_all(questions_with_answers.questions)
+            session.add_all(questions_with_answers.answers)
+            session.commit()
 
     def get_history_questions(
         self, question_input: GetVocabularyHistoryQuestion, user_id: str
     ) -> list[Type[VocabularyPrompt]]:
         with self.session_factory() as session:
-            try:
-                prompts = (
-                    session.query(VocabularyPrompt)
-                    .join(Category)
-                    .join(Language)
-                    .options(
-                        joinedload(VocabularyPrompt.language),
-                        joinedload(VocabularyPrompt.translations).joinedload(
-                            VocabularyPromptTranslation.translated_language
+            prompts = (
+                session.query(VocabularyPrompt)
+                .join(Category)
+                .join(Language)
+                .options(
+                    joinedload(VocabularyPrompt.language),
+                    joinedload(VocabularyPrompt.translations).joinedload(
+                        VocabularyPromptTranslation.translated_language
+                    ),
+                    joinedload(VocabularyPrompt.questions).options(
+                        joinedload(VocabularyQuestion.translations),
+                        joinedload(VocabularyQuestion.answers).joinedload(
+                            VocabularyAnswer.translations
                         ),
-                        joinedload(VocabularyPrompt.questions).options(
-                            joinedload(VocabularyQuestion.translations),
-                            joinedload(VocabularyQuestion.answers).joinedload(
-                                VocabularyAnswer.translations
-                            ),
-                        ),
-                    )
-                    .filter(
-                        and_(
-                            Category.id == question_input.category_id,
-                            Category.user_id == user_id,
-                            Language.language_name
-                            == question_input.learning_language.upper(),
-                            VocabularyPrompt.is_valid,
-                        )
-                    )
-                    .limit(question_input.limit_prompts)
-                    .all()
+                    ),
                 )
-                return prompts
-            except SQLAlchemyError as err:
-                self.logger.error(err)
-            return []
+                .filter(
+                    and_(
+                        Category.id == question_input.category_id,
+                        Category.user_id == user_id,
+                        Language.language_name
+                        == question_input.learning_language.upper(),
+                        VocabularyPrompt.is_valid,
+                    )
+                )
+                .limit(question_input.limit_prompts)
+                .all()
+            )
+            return prompts
