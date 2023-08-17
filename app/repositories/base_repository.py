@@ -4,7 +4,6 @@ from typing import Any, Callable, Dict, Generic, List, Optional, Type, TypeVar, 
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.infrastructure.db.database import Base
@@ -26,11 +25,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def get(self, id: Any) -> Optional[ModelType]:
         with self.session_factory() as session:
-            try:
-                return session.query(self.model).filter(self.model.id == id).first()
-            except SQLAlchemyError as err:
-                self.logger.error(err)
-            return None
+            return session.query(self.model).filter(self.model.id == id).first()
 
     def query(self, query: Any, limit: int = 200) -> Optional[ModelType]:
         with self.session_factory() as session:
