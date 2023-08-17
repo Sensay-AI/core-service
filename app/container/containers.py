@@ -19,6 +19,7 @@ from app.repositories.base_repository import BaseRepository
 from app.repositories.user_repository import UserRepository
 from app.repositories.vocabulary_repository import VocabularyRepository
 from app.services.user_service import UserService
+from app.services.vocabulary_service import VocabularyService
 
 
 class Container(containers.DeclarativeContainer):
@@ -124,4 +125,10 @@ class Container(containers.DeclarativeContainer):
         VocabularyRepository,
         model=VocabularyPrompt,
         session_factory=db.provided.session,
+    )
+
+    vocabulary_service = providers.Factory(
+        VocabularyService,
+        voca_generator=chatGPT_vocabulary_generator,
+        voca_repository=vocabulary_repository,
     )

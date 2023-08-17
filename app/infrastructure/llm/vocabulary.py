@@ -56,7 +56,6 @@ class ChatGPTVocabularyGenerator:
                 num_answers=num_answers,
                 format_output=self._vocabulary_format,
             )
-            self.logger.debug(f"Prompt: {prompt}")
             response = self.model.predict(prompt)
             response = response.replace("\\n", " ")
             response = response.replace("\n", " ")
@@ -70,4 +69,4 @@ class ChatGPTVocabularyGenerator:
 
 class PromptParserException(Exception):
     def __init__(self) -> None:
-        super().__init__("Can not parse prompt response to json!")
+        super().__init__("Can not parse prompt response to json")
