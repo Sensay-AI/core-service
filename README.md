@@ -86,7 +86,7 @@ Some important note!!:
 - For some config like this ${AWS_ACCESS_KEY_ID}, ${ENV_NAME},... meaning they are the 
 environment variable in your local machine, or they can be set in the run time of the application,...
 please refer to this to update on those setting on MacOS, Window, Ubuntu..
-- ${ENV_NAME:"local"} meaning the it will look for your env if not it get default as "local" 
+- ${ENV_NAME:"local"} meaning it will look for your env if not it get default as "local" 
 - For ${AWS_SECRET_ACCESS_KEY} please read this https://docs.aws.amazon.com/powershell/latest/userguide/pstools-appendix-sign-up.html
 - Some section in the yaml file have the structure like this:
 ```yaml
@@ -99,3 +99,19 @@ meaning they can switch-variant base on the ENV_NAME you currently running,
 so if you want you can update those section to update the variable for 
 the environment you want to run the application on
 - reference: https://python-dependency-injector.ets-labs.org/providers/configuration.html
+
+## Architecture - Project Structure
+| Layer Name       | Description                                                                                                                                                                 | Dependencies |
+|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| Models           | This define domain models. The business logic should be implemented in this project.                                                                                        | No           |
+| Infrastructures  | This handles the external interaction like DB, GoogleSheet, Auth0, and etc. Within this project, library exposing data structure should be converted into the domain models | Yes          |
+| Services         | This should implement use cases using infrastructures & domain-models.                                                                                                      | Yes          |
+| Routes -Endpoint | This should include the code run an application and application specific logic like HTTP Endpoint or background workers                                                     | Yes          |
+| Schema           | This will define the Route (Controller) Input/ endpoint schema                                                                                                              | Yes          |
+| Container        | This will include the Dependency Injector Container to provide and wire up the dependency for the application                                                               | ---          |
+| Other tooling    | Other tool like Docker, Script, GithubAction, Alchemic, Poetry ... will set up along with this service as well to help set up the project and deployment                    | ---          |
+The image bellow show the overview of this architecture
+
+(The arrow meaning: Service <--- Model mean that Service layer will have the dependency from Model layer)
+
+![img.png](ArchitectureProjectStructure.png)
