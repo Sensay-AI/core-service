@@ -1,35 +1,33 @@
 """ Transcribe api. """
 import base64
-from http import HTTPStatus
 
 from google.cloud.speech_v2 import SpeechClient
 from google.cloud.speech_v2.types import cloud_speech
 
-from dependency_injector.wiring import Provide, inject
+
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 
+from dependency_injector.wiring import Provide, inject
 from app.container.containers import Container
-from app.routes.api_v1.endpoints.auth import check_user
-from app.schemas.users import Auth0User
-from app.infrastructure.aws.s3 import S3Service
 
 
-#Router initialize
+# Router initialize
 router = APIRouter()
 
+
 @router.post("/")
-async def transcribe_audio (
+@inject
+async def transcribe_audio(
     language_code: str,
     file: UploadFile,
-    auth: Auth0User = Depends(check_user),
     project_id: str = Depends(Provide[Container.google_project_id]),
     gcp_credentials: str = Depends(Provide[Container.google_credential_file]),
-    ) -> object:
+) -> object:
     """Transcribe an audio file."""
 
     decoded_gcp_credentials = base64.b64decode(gcp_credentials).decode("utf-8")
     temp_credentials_path = "temp_credentials.json"
-    with open(temp_credentials_path,  "w", encoding="utf-8") as temp_file:
+    with open(temp_credentials_path, "w", encoding="utf-8") as temp_file:
         temp_file.write(decoded_gcp_credentials)
 
     audio_file_type = file.content_type
@@ -37,10 +35,9 @@ async def transcribe_audio (
     client = SpeechClient.from_service_account_file(temp_credentials_path)
 
     # Check if the uploaded file is an audio mp3 file
-    if audio_file_type not in  ["audio/mpeg", "audio/flac", "audio/wav"]:
+    if audio_file_type not in ["audio/mpeg", "audio/flac", "audio/wav"]:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unsupported file type"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported file type"
         )
     # Reads a file as bytes
     audio_content = await file.read()
@@ -56,8 +53,8 @@ async def transcribe_audio (
     )
 
     recogniser_gcp = f"projects/{project_id}/locations/global/recognizers/_".format(
-        project_id = project_id
-        )
+        project_id=project_id
+    )
     request = cloud_speech.RecognizeRequest(
         recognizer=recogniser_gcp,
         config=config,
@@ -68,6 +65,6 @@ async def transcribe_audio (
     response = client.recognize(request=request)
     transcriptions = [result.alternatives[0].transcript for result in response.results]
 
-    response_transcribe = ''.join(transcriptions)
+    response_transcribe = "".join(transcriptions)
 
     return {"transcriptions": response_transcribe}
