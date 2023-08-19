@@ -94,8 +94,12 @@ class Container(containers.DeclarativeContainer):
         config.infrastructures.aws.s3_image_bucket[env_name]
     )
 
+    s3_audio_bucket = providers.Resource(
+        config.infrastructures.aws.s3_audio_bucket[env_name]
+    )
+
     google_credential_file = providers.Resource(
-        config.infrastructures.gcp.google_credential_file
+        config.infrastructures.gcp.google_credential_file,
     )
 
     google_project_id = providers.Resource(

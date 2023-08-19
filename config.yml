@@ -15,6 +15,10 @@ infrastructures:
       production: "sensayai-images"
       development: "sensayai-images-dev"
       local: "sensayai-images-local"
+    s3_audio_bucket:
+      production: "sensayai-audio"
+      development: "sensayai-audio-dev"
+      local: "sensayai-audio-local"
   db:
     url: ${DB_URL}
   auth0:
