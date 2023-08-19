@@ -1,11 +1,12 @@
-""" Transcribe api. """
+""" Transcribe api """
 import base64
 
-from app.container.containers import Container
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from google.cloud.speech_v2 import SpeechClient
 from google.cloud.speech_v2.types import cloud_speech
+
+from app.container.containers import Container
 
 # Router initialize
 router = APIRouter()
@@ -20,7 +21,6 @@ async def transcribe_audio(
     gcp_credentials: str = Depends(Provide[Container.google_credential_file]),
 ) -> object:
     """Transcribe an audio file."""
-
     decoded_gcp_credentials = base64.b64decode(gcp_credentials).decode("utf-8")
     temp_credentials_path = "temp_credentials.json"
     with open(temp_credentials_path, "w", encoding="utf-8") as temp_file:
