@@ -4,17 +4,16 @@ from typing import Dict
 
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 
 from app.captions.replicate_caption import CaptionGenerator
-from app.chatgpt.chatgpt_requests import rewrite_caption_in_language
 from app.container.containers import Container
 from app.core.auth0 import check_user
-from app.db.database import get_db
 from app.infrastructure.aws.s3 import S3Service
+from app.infrastructure.llm.caption import ChatGPTCaption
 from app.models.image_caption import ImageCaption, ImageCaptionRequest
 from app.repositories.user_repository import UserNotFoundError
 from app.schemas.users import Auth0User
+from app.services.caption_service import CaptionService
 from app.services.user_service import UserService
 
 router = APIRouter()
@@ -23,11 +22,12 @@ router = APIRouter()
 @router.post("/generate")
 def generate_caption(
     input_data: ImageCaptionRequest,
-    db: Session = Depends(get_db),
     auth: Auth0User = Depends(check_user),
     user_service: UserService = Depends(Provide[Container.user_service]),
     s3_service: S3Service = Depends(Provide[Container.s3_service]),
-    caption_service: CaptionGenerator = Depends(Provide[Container.caption_service]),
+    caption_service: CaptionService = Depends(Provide[Container.caption_service]),
+    caption_generator: CaptionGenerator = Depends(Provide[Container.caption_generator]),
+    chatgpt_caption: ChatGPTCaption = Depends(Provide[Container.chatgpt_caption]),
 ) -> Dict[str, str]:
     language = input_data.language
     image_url = input_data.image_url
@@ -51,7 +51,7 @@ def generate_caption(
             detail="The image does not exist",
         )
     image_file = BytesIO(image_file)
-    caption = caption_service.generate_from_image(
+    caption = caption_generator.generate_from_image(
         prompt="Generate a caption for the following image", image_file=image_file
     )
     if not caption:
@@ -59,7 +59,9 @@ def generate_caption(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail="Error generating caption",
         )
-    rewritten_caption = rewrite_caption_in_language(caption=caption, language=language)
+    rewritten_caption = chatgpt_caption.rewrite_caption(
+        caption=caption, language=language
+    )
     if not rewritten_caption:
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -68,8 +70,5 @@ def generate_caption(
     new_image_caption = ImageCaption()
     new_image_caption.user_id = user_id
     new_image_caption.image_url = image_url
-    new_image_caption.rewritten_caption = rewritten_caption
-    db.add(new_image_caption)
-    db.commit()
-    db.refresh(new_image_caption)
-    return {"caption": rewritten_caption}
+    new_image_caption.caption = rewritten_caption
+    return caption_service.add_image_caption(new_image_caption)

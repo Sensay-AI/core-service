@@ -7,13 +7,17 @@ import sentry_sdk
 from botocore.client import BaseClient
 from dependency_injector import containers, providers
 from dependency_injector.providers import Resource
+from langchain.llms import OpenAI
 from replicate import Client
 
 from app.infrastructure.auth0.auth0 import Auth0Service
 from app.infrastructure.aws.s3 import S3Service
 from app.infrastructure.captions.replicate_caption import CaptionGenerator
 from app.infrastructure.db.database import Database
+from app.infrastructure.llm.caption import ChatGPTCaption
+from app.repositories.caption_repository import CaptionRepository
 from app.repositories.user_repository import UserRepository
+from app.services.caption_service import CaptionService
 from app.services.user_service import UserService
 
 
@@ -97,8 +101,25 @@ class Container(containers.DeclarativeContainer):
 
     caption_client = providers.Resource(Client, api_token=config.replicate.access_token)
 
-    caption_service = providers.Factory(
+    caption_generator = providers.Singleton(
         CaptionGenerator,
         model_id=config.replicate.model_id,
         caption_client=caption_client,
+    )
+    open_ai: OpenAI = providers.Singleton(
+        OpenAI,
+        openai_api_key=config.infrastructures.open_ai.openai_api_key,
+        max_tokens=config.infrastructures.open_ai.max_tokens,
+        temperature=config.infrastructures.open_ai.temperature,
+    )
+
+    chatgpt_caption = providers.Singleton(ChatGPTCaption, model=open_ai)
+
+    image_caption_repository = providers.Factory(
+        CaptionRepository, session_factory=db.provided.session
+    )
+
+    caption_service = providers.Factory(
+        CaptionService,
+        image_caption_repository=image_caption_repository,
     )
