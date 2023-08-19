@@ -5,16 +5,17 @@ import pytest
 from fastapi.testclient import TestClient
 from langchain import OpenAI
 
-from app.infrastructure.auth0.auth0 import Auth0Service
 from app.main import app
+from app.models.vocabulary import Category
 from app.repositories.vocabulary_repository import VocabularyRepository
-from app.schemas.users import Auth0User
 from app.schemas.vocabulary import (
     VocabularyAnswerCreate,
     VocabularyPromptCreate,
     VocabularyQuestionCreate,
 )
-from app.services.vocabulary_service import parse_json_prompt
+from app.services.base_service import BaseService
+from app.services.vocabulary_service import VocabularyService, parse_json_prompt
+from app.tests.utils import get_http_header, mock_user
 
 LEARNING_LANGUAGE = "english"
 TRANSLATED_LANGUAGE = "vietnamese"
@@ -27,11 +28,18 @@ def client():
     return TestClient(app)
 
 
-def mock_chat_gpt_response() -> str:
+def mock_category() -> list[Category]:
+    return [
+        Category(id=1, category_name="football"),
+        Category(id=2, category_name="movie"),
+    ]
+
+
+def mock_wrong_chat_gpt_response() -> str:
     return """{ 
         "english": { 
-            "lesson": "ABCD
-                       ABCD",
+            "lesson": "E
+                       ABCD"
                 "questions": [
                     {
                     "Question": "What is the term used for a person who runs in a race?",
@@ -39,7 +47,7 @@ def mock_chat_gpt_response() -> str:
                     "Answer": "Runner"
                     },
                 ]
-                },
+                }
         "vietnamese": {
                     "lesson": "ABCD
                                ABCD",
@@ -49,6 +57,34 @@ def mock_chat_gpt_response() -> str:
                     "Options": ["Swimmer", "Runner", "Cyclist", "Skater"],
                     "Answer": "Runner"
                     },
+                ]
+        }
+    }
+    """
+
+
+def mock_chat_gpt_response() -> str:
+    return """{ 
+        "english": { 
+            "lesson": "ABCD
+                       ABCD",
+                "questions": [
+                    {
+                    "question": "What is the term used for a person who runs in a race?",
+                    "options": ["Swimmer", "Runner", "Cyclist", "Skater"],
+                    "answer": "Runner"
+                    }
+                ]
+                },
+        "vietnamese": {
+                    "lesson": "ABCD
+                               ABCD",
+                "questions": [
+                    {
+                    "question": "What is the term used for a person who runs in a race?",
+                    "options": ["Swimmer", "Runner", "Cyclist", "Skater"],
+                    "answer": "Runner"
+                    }
                 ]
         }
     }
@@ -99,10 +135,7 @@ def mock_lesson_object() -> VocabularyPromptCreate:
 
 
 # def test_api_new_vocabulary_questions(client):
-#     auth_service_mock = mock.Mock(spec=Auth0Service)
-#     auth_service_mock.verify_token.return_value = Auth0User(
-#         sub="user123", permissions=["read", "write"]
-#     )
+#     auth_service_mock = prepare_user()
 #     app.container.auth.override(auth_service_mock)
 #     voca_repo_mock = mock.Mock(spec=VocabularyRepository)
 #     app.container.vocabulary_repository.override(voca_repo_mock)
@@ -125,33 +158,55 @@ def mock_lesson_object() -> VocabularyPromptCreate:
 
 
 def test_func_generate_vocabulary_questions(client):
-    auth_service_mock = mock.Mock(spec=Auth0Service)
-    auth_service_mock.verify_token.return_value = Auth0User(
-        sub="user123", permissions=["read", "write"]
-    )
+    auth_service_mock = mock_user()
     voca_repo_mock = mock.Mock(spec=VocabularyRepository)
 
     open_ai_mock = mock.Mock(spec=OpenAI)
     open_ai_mock.predict.return_value = mock_chat_gpt_response()
 
     app.container.auth.override(auth_service_mock)
-    app.container.open_ai.override(open_ai_mock)
     app.container.vocabulary_repository.override(voca_repo_mock)
-    response = client.post(
-        "/api/v1/lesson/vocabulary/questions",
-        headers={
-            "Accept": APPLICATION_JSON,
-            "Authorization": "Bearer xyz",
-        },
-        json={
-            "category": "football",
-            "translated_language": "english",
-            "learning_language": "vietnamese",
-            "num_questions": 1,
-            "num_answers": 1,
-        },
-    )
+    payload = {
+        "category": "football",
+        "translated_language": "english",
+        "learning_language": "vietnamese",
+        "num_questions": 1,
+        "num_answers": 1,
+    }
+    with app.container.open_ai.override(open_ai_mock):
+        response = client.post(
+            "/api/v1/lesson/vocabulary/questions",
+            headers=get_http_header(),
+            json=payload,
+        )
     assert response.status_code == 200
+    assert "status_code" not in response.json().keys()
+
+
+# def test_prompt_parse_failed(client):
+#     auth_service_mock = mock_user()
+#     voca_repo_mock = mock.Mock(spec=VocabularyRepository)
+#
+#     open_ai_mock = mock.Mock(spec=OpenAI)
+#     open_ai_mock.predict.return_value = mock_wrong_chat_gpt_response()
+#
+#     app.container.auth.override(auth_service_mock)
+#     app.container.vocabulary_repository.override(voca_repo_mock)
+#     payload = {
+#         "category": "football",
+#         "translated_language": "english",
+#         "learning_language": "vietnamese",
+#         "num_questions": 1,
+#         "num_answers": 1,
+#     }
+#     with app.container.open_ai.override(open_ai_mock):
+#         response = client.post(
+#             "/api/v1/lesson/vocabulary/questions",
+#             headers=get_http_header(),
+#             json=payload,
+#         )
+#     assert response.status_code == 200
+#     assert "status_code" in response.json().keys()
 
 
 def test_parse_json_prompt():
@@ -161,3 +216,41 @@ def test_parse_json_prompt():
     output_obj = mock_lesson_object()
 
     assert input_obj == output_obj
+
+
+def test_get_category(client):
+    auth_service_mock = mock_user()
+
+    category_service_mock = mock.Mock(spec=BaseService)
+    category_service_mock.query.return_value = mock_category()
+
+    app.container.auth.override(auth_service_mock)
+    app.container.category_service.override(category_service_mock)
+
+    response = client.get(
+        "/api/v1/lesson/vocabulary/category", headers=get_http_header()
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            {"category_name": "football", "id": 1},
+            {"category_name": "movie", "id": 2},
+        ]
+    }
+
+
+def test_get_history_question(client):
+    auth_service_mock = mock_user()
+
+    vocabulary_service_mock = mock.Mock(spec=VocabularyService)
+    vocabulary_service_mock.get_history_lessons.return_value = []
+
+    app.container.auth.override(auth_service_mock)
+    app.container.vocabulary_service.override(vocabulary_service_mock)
+
+    response = client.post(
+        "/api/v1/lesson/vocabulary/category/history/questions",
+        headers=get_http_header(),
+        json={"category_id": 1, "limit_prompts": 10, "learning_language": "english"},
+    )
+    assert response.status_code == 200

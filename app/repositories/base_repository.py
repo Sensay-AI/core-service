@@ -27,7 +27,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         with self.session_factory() as session:
             return session.query(self.model).filter(self.model.id == id).first()
 
-    def query(self, query: Any, limit: int = 200) -> Optional[ModelType]:
+    def query(self, query: Any, limit: int = 200) -> list[ModelType]:
         with self.session_factory() as session:
             return session.query(self.model).filter(query).limit(limit).all()
 

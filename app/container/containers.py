@@ -18,6 +18,7 @@ from app.models.vocabulary import Category, VocabularyPrompt
 from app.repositories.base_repository import BaseRepository
 from app.repositories.user_repository import UserRepository
 from app.repositories.vocabulary_repository import VocabularyRepository
+from app.services.base_service import BaseService
 from app.services.user_service import UserService
 from app.services.vocabulary_service import VocabularyService
 
@@ -25,7 +26,7 @@ from app.services.vocabulary_service import VocabularyService
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
         modules=[
-            "app.routes.api_v1.endpoints.image_upload",
+            # "app.routes.api_v1.endpoints.image_upload",
             "app.routes.api_v1.endpoints.user",
             "app.routes.api_v1.endpoints.auth",
             "app.routes.api_v1.endpoints.language",
@@ -33,7 +34,7 @@ class Container(containers.DeclarativeContainer):
         ]
     )
 
-    config = providers.Configuration(yaml_files=["config.yml"])
+    config = providers.Configuration(yaml_files=["config1.yml"])
 
     env_name = providers.Resource(config.core.app.env)
 
@@ -132,3 +133,7 @@ class Container(containers.DeclarativeContainer):
         voca_generator=chatGPT_vocabulary_generator,
         voca_repository=vocabulary_repository,
     )
+
+    category_service = providers.Factory(BaseService, repository=category_repository)
+
+    language_service = providers.Factory(BaseService, repository=language_repository)
