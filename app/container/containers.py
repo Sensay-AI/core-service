@@ -99,7 +99,7 @@ class Container(containers.DeclarativeContainer):
         config.infrastructures.aws.s3_image_bucket[env_name]
     )
 
-    caption_client = providers.Resource(
+    caption_client: Resource[Client] = providers.Resource(
         Client, api_token=config.infrastructures.captions.replicate.access_token
     )
 

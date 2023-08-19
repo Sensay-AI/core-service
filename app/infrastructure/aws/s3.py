@@ -1,6 +1,7 @@
 import hashlib
 import logging
 from io import BytesIO
+from typing import Any
 
 from boto3_type_annotations.s3 import Client
 from botocore.exceptions import ClientError
@@ -43,12 +44,13 @@ class S3Service:
         )
         return self.create_pre_signed_url(bucket_name, upload_path)
 
-    def get_file(self, file_path: str, bucket_name: str) -> dict:
+    def get_file(self, file_path: str, bucket_name: str) -> Any:
         try:
             obj = self.s3_client.get_object(Bucket=bucket_name, Key=file_path)
+            obj = obj["Body"].read()
         except ClientError as e:
             self.logger.error(e, exc_info=True)
-            return {}
+            return None
         return obj
 
     def create_pre_signed_url(

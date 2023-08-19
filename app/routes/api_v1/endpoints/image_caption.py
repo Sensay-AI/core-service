@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from io import BytesIO
-from typing import Dict
 
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException
@@ -26,15 +25,16 @@ def generate_caption(
     auth: Auth0User = Depends(check_user),
     user_service: UserService = Depends(Provide[Container.user_service]),
     s3_service: S3Service = Depends(Provide[Container.s3_service]),
+    s3_image_bucket: str = Depends(Provide[Container.s3_image_bucket]),
     caption_service: CaptionService = Depends(Provide[Container.caption_service]),
     caption_generator: CaptionGenerator = Depends(Provide[Container.caption_generator]),
     chatgpt_caption: ChatGPTCaption = Depends(Provide[Container.chatgpt_caption]),
-) -> Dict[str, str]:
+) -> object:
     language = input_data.language
     image_url = input_data.image_url
     user_id = auth.id
     try:
-        user_service.get_by_id(user_id)
+        user_service.get_user_by_id(user_id)
     except UserNotFoundError:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
@@ -42,11 +42,9 @@ def generate_caption(
         )
     image_file = s3_service.get_file(
         file_path=image_url,
-        bucket_name=Container.config.infrastructures.aws.s3_image_bucket,
+        bucket_name=s3_image_bucket,
     )
-    if image_file:
-        image_file = image_file["Body"].read()
-    else:
+    if image_file is None:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail="The image does not exist",
