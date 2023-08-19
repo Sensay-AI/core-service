@@ -63,6 +63,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          GOOGLE_CREDENTIAL_FILE: ${{ secrets.GOOGLE_CREDENTIAL_FILE }}
+          GOOGLE_PROJECT_ID: ${{ secrets.GOOGLE_PROJECT_ID }}
         run: |
           echo "Running the tests..."
           poetry run pytest -v -s

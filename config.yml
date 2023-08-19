@@ -29,3 +29,4 @@ infrastructures:
       local: ""
   gcp:
     google_credential_file: "${GOOGLE_CREDENTIAL_FILE}"
+    google_project_id: "${GOOGLE_PROJECT_ID}"

@@ -94,6 +94,10 @@ class Container(containers.DeclarativeContainer):
         config.infrastructures.aws.s3_image_bucket[env_name]
     )
 
-    google_credentials_file = providers.Resource(
-        config.infrastructure.gcp.google_credentials_file
+    google_credential_file = providers.Resource(
+        config.infrastructures.gcp.google_credential_file
+    )
+
+    google_project_id = providers.Resource(
+        config.infrastructures.gcp.google_project_id,
     )
