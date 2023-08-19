@@ -1,15 +1,11 @@
 """ Transcribe api. """
 import base64
 
+from app.container.containers import Container
+from dependency_injector.wiring import Provide, inject
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from google.cloud.speech_v2 import SpeechClient
 from google.cloud.speech_v2.types import cloud_speech
-
-
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
-
-from dependency_injector.wiring import Provide, inject
-from app.container.containers import Container
-
 
 # Router initialize
 router = APIRouter()

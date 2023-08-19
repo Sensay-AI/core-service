@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.routes.api_v1.endpoints import auth, image_upload, user, transcribe
+from app.routes.api_v1.endpoints import auth, image_upload, transcribe, user
 
 router = APIRouter()
 router.include_router(user.router, prefix="/user", tags=["user"])
