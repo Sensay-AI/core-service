@@ -6,8 +6,9 @@ from singleton_decorator import singleton
 
 @singleton
 class CaptionGenerator:
-    def __init__(self, caption_client: Client) -> None:
+    def __init__(self, caption_client: Client, model_id: str) -> None:
         self.caption_client = caption_client
+        self.model_id = model_id
 
     def generate_from_image(self, prompt: str, image_file: BytesIO) -> str:
         caption = []

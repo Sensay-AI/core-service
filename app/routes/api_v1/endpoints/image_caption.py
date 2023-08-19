@@ -5,13 +5,14 @@ from typing import Dict
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.captions.replicate_caption import CaptionGenerator
 from app.container.containers import Container
-from app.core.auth0 import check_user
 from app.infrastructure.aws.s3 import S3Service
+from app.infrastructure.captions.replicate_caption import CaptionGenerator
 from app.infrastructure.llm.caption import ChatGPTCaption
-from app.models.image_caption import ImageCaption, ImageCaptionRequest
+from app.models.image_caption import ImageCaption
 from app.repositories.user_repository import UserNotFoundError
+from app.routes.api_v1.endpoints.auth import check_user
+from app.schemas.image_caption import ImageCaptionRequest
 from app.schemas.users import Auth0User
 from app.services.caption_service import CaptionService
 from app.services.user_service import UserService

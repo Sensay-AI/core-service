@@ -1,7 +1,7 @@
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.sql import func
 
-from app.db.database import Base
+from app.infrastructure.db.database import Base
 
 
 class ImageCaption(Base):

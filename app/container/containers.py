@@ -99,18 +99,19 @@ class Container(containers.DeclarativeContainer):
         config.infrastructures.aws.s3_image_bucket[env_name]
     )
 
-    caption_client = providers.Resource(Client, api_token=config.replicate.access_token)
+    caption_client = providers.Resource(
+        Client, api_token=config.infrastructures.captions.replicate.access_token
+    )
 
     caption_generator = providers.Singleton(
         CaptionGenerator,
-        model_id=config.replicate.model_id,
+        model_id=config.infrastructures.captions.replicate.model_id,
         caption_client=caption_client,
     )
     open_ai: OpenAI = providers.Singleton(
         OpenAI,
         openai_api_key=config.infrastructures.open_ai.openai_api_key,
         max_tokens=config.infrastructures.open_ai.max_tokens,
-        temperature=config.infrastructures.open_ai.temperature,
     )
 
     chatgpt_caption = providers.Singleton(ChatGPTCaption, model=open_ai)

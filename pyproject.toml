@@ -137,6 +137,7 @@ pillow = "^10.0.0"
 replicate = "^0.11.0"
 openai = "^0.27.8"
 boto3-type-annotations-with-docs = "^0.3.1"
+langchain = "^0.0.265"
 dependency-injector = "^4.41.0"
 pyyaml = "^6.0.1"
 sentry-sdk = { version = "*", extras = ["fastapi"] }
@@ -151,9 +152,6 @@ ruff = "^0.0.284"
 pytest = "^7.3.2"
 requests = "^2.31.0"
 pytest-asyncio = "^0.21.1"
-pillow = "^10.0.0"
-replicate = "^0.11.0"
-openai = "^0.27.8"
 
 [build-system]
 requires = ["poetry-core"]
