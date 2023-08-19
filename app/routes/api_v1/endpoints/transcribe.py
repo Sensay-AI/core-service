@@ -21,8 +21,8 @@ async def transcribe_audio (
     language_code: str,
     file: UploadFile, 
     auth: Auth0User = Depends(check_user),
-    project_id: str = Container.google_project_id,
-    gcp_credentials: str = Container.google_credential_file,
+    project_id: str = Depends(Provide[Container.google_project_id]),
+    gcp_credentials: str = Depends(Provide[Container.google_credential_file]),
     ) -> object:
     """Transcribe an audio file."""
 
