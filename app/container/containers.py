@@ -120,7 +120,7 @@ class Container(containers.DeclarativeContainer):
         CaptionRepository, session_factory=db.provided.session
     )
 
-    caption_service = providers.Factory(
+    caption_service = providers.Singleton(
         CaptionService,
         image_caption_repository=image_caption_repository,
     )
