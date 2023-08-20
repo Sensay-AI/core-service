@@ -6,13 +6,13 @@ from fastapi.testclient import TestClient
 from langchain import OpenAI
 
 from app.main import app
-from app.models.vocabulary import Category
-from app.repositories.vocabulary_repository import VocabularyRepository
-from app.schemas.vocabulary import (
+from app.models.db.vocabulary import Category
+from app.models.schemas.vocabulary import (
     VocabularyAnswerCreate,
     VocabularyPromptCreate,
     VocabularyQuestionCreate,
 )
+from app.repositories.vocabulary_repository import VocabularyRepository
 from app.services.base_service import BaseService
 from app.services.vocabulary_service import VocabularyService, parse_json_prompt
 from app.tests.utils import get_http_header, mock_user

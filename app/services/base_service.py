@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional, Union
 
-from app.infrastructure.pagination import PagedResponseSchema
+from app.models.common.pagination import PagedResponseSchema
 from app.repositories.base_repository import (
     BaseRepository,
     CreateSchemaType,

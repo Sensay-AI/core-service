@@ -2,7 +2,7 @@ from typing import Any
 from unittest import mock
 
 from app.infrastructure.auth0.auth0 import Auth0Service
-from app.schemas.users import Auth0User
+from app.models.schemas.users import Auth0User
 
 
 def get_http_header(bearer_key: str = "xyz") -> dict[str, Any]:

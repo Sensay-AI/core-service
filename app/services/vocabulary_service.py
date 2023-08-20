@@ -3,16 +3,16 @@ from typing import Any
 from app.infrastructure.llm.vocabulary import (
     ChatGPTVocabularyGenerator,
 )
-from app.infrastructure.pagination import PagedResponseSchema
-from app.models.vocabulary import VocabularyPrompt
-from app.repositories.vocabulary_repository import VocabularyRepository
-from app.schemas.vocabulary import (
+from app.models.common.pagination import PagedResponseSchema
+from app.models.db.vocabulary import VocabularyPrompt
+from app.models.schemas.vocabulary import (
     GetVocabularyHistoryQuestion,
     GetVocabularyQuestions,
     VocabularyAnswerCreate,
     VocabularyPromptCreate,
     VocabularyQuestionCreate,
 )
+from app.repositories.vocabulary_repository import VocabularyRepository
 from app.services.base_service import BaseService
 
 

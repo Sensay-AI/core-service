@@ -6,8 +6,8 @@ from fastapi.testclient import TestClient
 
 from app.infrastructure.auth0.auth0 import Auth0Service
 from app.main import app
+from app.models.schemas.users import Auth0User
 from app.repositories.user_repository import UserRepository
-from app.schemas.users import Auth0User
 
 APPLICATION_JSON = "application/json"
 

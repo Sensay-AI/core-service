@@ -6,7 +6,7 @@ from psycopg2 import errors
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.models.users import UserInfo
+from app.models.db.users import UserInfo
 
 UniqueViolation = errors.lookup("23505")  # Correct way to Import the psycopg2 errors
 

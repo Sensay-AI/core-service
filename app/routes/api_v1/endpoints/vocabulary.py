@@ -5,15 +5,15 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.container.containers import Container
 from app.infrastructure.llm.vocabulary import PromptParserException
-from app.infrastructure.pagination import PageParams
-from app.models.vocabulary import Category
-from app.repositories.vocabulary_repository import LanguageNotSupportException
-from app.routes.api_v1.endpoints.auth import check_user
-from app.schemas.users import Auth0User
-from app.schemas.vocabulary import (
+from app.models.common.pagination import PageParams
+from app.models.db.vocabulary import Category
+from app.models.schemas.users import Auth0User
+from app.models.schemas.vocabulary import (
     GetVocabularyHistoryQuestion,
     GetVocabularyQuestions,
 )
+from app.repositories.vocabulary_repository import LanguageNotSupportException
+from app.routes.api_v1.endpoints.auth import check_user
 from app.services.base_service import BaseService
 from app.services.vocabulary_service import VocabularyService
 

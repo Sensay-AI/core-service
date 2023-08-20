@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.infrastructure.db.database import Base
-from app.infrastructure.pagination import PagedResponseSchema, paginate
+from app.models.common.pagination import PagedResponseSchema, paginate
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)

@@ -5,9 +5,9 @@ from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session, joinedload
 
-from app.infrastructure.pagination import PagedResponseSchema, paginate
-from app.models.language import Language
-from app.models.vocabulary import (
+from app.models.common.pagination import PagedResponseSchema, paginate
+from app.models.db.language import Language
+from app.models.db.vocabulary import (
     Category,
     VocabularyAnswer,
     VocabularyAnswerTranslation,
@@ -16,8 +16,11 @@ from app.models.vocabulary import (
     VocabularyQuestion,
     VocabularyQuestionTranslation,
 )
+from app.models.schemas.vocabulary import (
+    GetVocabularyHistoryQuestion,
+    VocabularyPromptCreate,
+)
 from app.repositories.base_repository import BaseRepository
-from app.schemas.vocabulary import GetVocabularyHistoryQuestion, VocabularyPromptCreate
 
 
 @dataclass

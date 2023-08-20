@@ -4,7 +4,7 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends
 
 from app.container.containers import Container
-from app.infrastructure.pagination import PageParams
+from app.models.common.pagination import PageParams
 from app.routes.api_v1.endpoints.auth import check_user
 from app.services.base_service import BaseService
 
