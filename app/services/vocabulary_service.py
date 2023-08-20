@@ -76,6 +76,7 @@ class VocabularyService(BaseService):
             learning_language=user_input.learning_language,
             num_questions=user_input.num_questions,
             num_answers=user_input.num_answers,
+            level=user_input.level,
         )
 
         learning_obj = parse_json_prompt(
@@ -84,6 +85,8 @@ class VocabularyService(BaseService):
             user_input.translated_language,
             questions,
         )
+
+        learning_obj.level = user_input.level
 
         self._add_lesson_to_database(learning_obj, user_id)
         return questions

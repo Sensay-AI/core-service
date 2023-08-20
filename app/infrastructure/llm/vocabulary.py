@@ -20,7 +20,7 @@ class ChatGPTVocabularyGenerator:
             }"""
 
     _vocabulary_template = """
-            Create a prompt lesson more than 100 words about {{ category }} and suggest {{ num_questions }} vocabulary 
+            Create a prompt lesson more than 100 words about {{ category }} in level {{ level }} and suggest {{ num_questions }} vocabulary 
             to learn {{ learning_language }} in multiple-choice format with {{ num_answers }} answers, 
             display the answer for each question  and translate to {{ primary_language }}
             Do not include any explanations, only provide a RFC8259 compliant JSON response following 
@@ -42,6 +42,7 @@ class ChatGPTVocabularyGenerator:
         learning_language: str,
         num_questions: int = 4,
         num_answers: int = 5,
+        level: int = 1,
     ) -> dict[str, Any]:
         try:
             start = datetime.now()
@@ -56,6 +57,7 @@ class ChatGPTVocabularyGenerator:
                 num_questions=num_questions,
                 num_answers=num_answers,
                 format_output=self._vocabulary_format,
+                level=level,
             )
             response = self.model.predict(prompt)
             response = response.replace("\\n", " ")

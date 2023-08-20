@@ -86,6 +86,7 @@ class VocabularyRepository(
         prompt_create: VocabularyPromptCreate,
         user_id: str,
     ) -> None:
+        self.logger.debug("Add voca lesson to database")
         with self.session_factory() as session:
             stmt = (
                 insert(Category)
@@ -109,6 +110,7 @@ class VocabularyRepository(
             prompt_obj = VocabularyPrompt(
                 prompt=prompt_create.prompt,
                 category_id=insert_id,
+                level=prompt_create.level,
                 language_id=learning_language_id,
             )
 

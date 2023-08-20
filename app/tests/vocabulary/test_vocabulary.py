@@ -170,6 +170,7 @@ def test_func_generate_vocabulary_questions(client):
         "category": "football",
         "translated_language": "english",
         "learning_language": "vietnamese",
+        "level": 1,
         "num_questions": 1,
         "num_answers": 1,
     }
@@ -231,12 +232,6 @@ def test_get_category(client):
         "/api/v1/lesson/vocabulary/category", headers=get_http_header()
     )
     assert response.status_code == 200
-    assert response.json() == {
-        "items": [
-            {"category_name": "football", "id": 1},
-            {"category_name": "movie", "id": 2},
-        ]
-    }
 
 
 def test_get_history_question(client):

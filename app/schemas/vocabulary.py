@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class GetVocabularyQuestions(BaseModel):
     category: str
+    level: int
     translated_language: str
     learning_language: str
     num_questions: int = 5
@@ -33,3 +34,4 @@ class VocabularyPromptCreate(BaseModel):
     learning_language: str
     translated_language: str
     translation: str
+    level: int = 1

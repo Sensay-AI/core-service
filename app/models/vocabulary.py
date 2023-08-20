@@ -36,6 +36,7 @@ class VocabularyPrompt(Base):
     __tablename__ = "vocabulary_prompts"
     id = Column(Integer, primary_key=True)
     prompt = Column(String, nullable=False)
+    level = Column(Integer, default=1)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now())
     is_valid = Column(Boolean, default=True)
