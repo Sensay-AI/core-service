@@ -109,10 +109,6 @@ class Container(containers.DeclarativeContainer):
         temperature=config.infrastructures.open_ai.temperature,
     )
 
-    chatGPT_vocabulary_generator = providers.Singleton(
-        ChatGPTVocabularyGenerator, model=open_ai
-    )
-
     language_repository = providers.Factory(
         BaseRepository, model=Language, session_factory=db.provided.session
     )
@@ -125,6 +121,12 @@ class Container(containers.DeclarativeContainer):
         VocabularyRepository,
         model=VocabularyPrompt,
         session_factory=db.provided.session,
+    )
+
+    chatGPT_vocabulary_generator = providers.Factory(
+        ChatGPTVocabularyGenerator,
+        model=open_ai,
+        voca_repository=vocabulary_repository
     )
 
     vocabulary_service = providers.Factory(
