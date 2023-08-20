@@ -1,14 +1,12 @@
 """ Transcribe api """
-import base64
 import io
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
-from google.cloud.speech_v2 import SpeechClient
-from google.cloud.speech_v2.types import cloud_speech
 
 from app.container.containers import Container
 from app.infrastructure.aws.s3 import S3Service
+from app.infrastructure.gcp.speech2text import Speech2Text
 from app.routes.api_v1.endpoints.auth import check_user
 from app.schemas.users import Auth0User
 
@@ -41,15 +39,6 @@ async def transcribe_audio(
     else:
         file_extension = ".wav"
 
-    decoded_gcp_credentials = base64.b64decode(gcp_credentials).decode("utf-8")
-
-    temp_credentials_path = "temp_credentials.json"
-    with open(temp_credentials_path, "w") as temp_file:
-        temp_file.write(decoded_gcp_credentials)
-
-    # Connect to Google Cloud Platform file
-    client = SpeechClient.from_service_account_json(temp_credentials_path)
-
     # Reads a file as bytes
     audio_content = await audio_file.read()
 
@@ -71,29 +60,10 @@ async def transcribe_audio(
             detail="We have an error uploading files",
         )
 
-    config = cloud_speech.RecognitionConfig(
-        auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
-        language_codes=[language_code],
-        model="long",
-        # Reference: https://cloud.google.com/speech-to-text/v2/docs/transcription-model
-        features=cloud_speech.RecognitionFeatures(
-            enable_automatic_punctuation=True,
-        ),
-    )
+    speech_to_text = Speech2Text(gcp_credentials)
 
-    recogniser_gcp = f"projects/{project_id}/locations/global/recognizers/_".format(
-        project_id=project_id
+    response_transcribe = speech_to_text.transcribe_audio(
+        project_id=project_id, language_code=language_code, audio_content=audio_content
     )
-    request = cloud_speech.RecognizeRequest(
-        recognizer=recogniser_gcp,
-        config=config,
-        content=audio_content,
-    )
-
-    # Transcribes the audio into text
-    response = client.recognize(request=request)
-    transcriptions = [result.alternatives[0].transcript for result in response.results]
-
-    response_transcribe = "".join(transcriptions)
 
     return {"transcriptions": response_transcribe, "audio_url": audio_url}
