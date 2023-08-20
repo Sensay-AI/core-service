@@ -13,8 +13,8 @@ from app.infrastructure.auth0.auth0 import Auth0Service
 from app.infrastructure.aws.s3 import S3Service
 from app.infrastructure.db.database import Database
 from app.infrastructure.llm.vocabulary import ChatGPTVocabularyGenerator
-from app.models.language import Language
-from app.models.vocabulary import Category, VocabularyPrompt
+from app.models.db.language import Language
+from app.models.db.vocabulary import Category, VocabularyPrompt
 from app.repositories.base_repository import BaseRepository
 from app.repositories.user_repository import UserRepository
 from app.repositories.vocabulary_repository import VocabularyRepository
