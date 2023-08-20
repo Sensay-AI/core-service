@@ -21,6 +21,7 @@ class Container(containers.DeclarativeContainer):
             "app.routes.api_v1.endpoints.image_upload",
             "app.routes.api_v1.endpoints.user",
             "app.routes.api_v1.endpoints.auth",
+            "app.routes.api_v1.endpoints.transcribe",
         ]
     )
 
@@ -91,4 +92,16 @@ class Container(containers.DeclarativeContainer):
 
     s3_image_bucket = providers.Resource(
         config.infrastructures.aws.s3_image_bucket[env_name]
+    )
+
+    s3_audio_bucket = providers.Resource(
+        config.infrastructures.aws.s3_audio_bucket[env_name]
+    )
+
+    google_credential_file = providers.Resource(
+        config.infrastructures.gcp.google_credential_file,
+    )
+
+    google_project_id = providers.Resource(
+        config.infrastructures.gcp.google_project_id,
     )

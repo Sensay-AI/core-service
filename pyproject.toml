@@ -13,7 +13,8 @@ license = {file = "LICENSE"}
 authors = [
     { name = "Minh Nguyen", email = "minh.nldang@gmail.com" },
     { name = "Tri Tran", email = "tri.trancongtoan@gmail.com" },
-    { name = "Binh Pham", email = "bnh.quang@gmail.com" }
+    { name = "Binh Pham", email = "bnh.quang@gmail.com" },
+    { name = "Phung Nguyen", email = "hphung10499@gmail.com"}
 ]
 dependencies = [
     "bcrypt",
@@ -140,6 +141,7 @@ boto3-type-annotations-with-docs = "^0.3.1"
 dependency-injector = "^4.41.0"
 pyyaml = "^6.0.1"
 sentry-sdk = { version = "*", extras = ["fastapi"] }
+google-cloud-speech = "^2.21.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
