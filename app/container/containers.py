@@ -26,7 +26,7 @@ from app.services.vocabulary_service import VocabularyService
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
         modules=[
-            # "app.routes.api_v1.endpoints.image_upload",
+            "app.routes.api_v1.endpoints.image_upload",
             "app.routes.api_v1.endpoints.user",
             "app.routes.api_v1.endpoints.auth",
             "app.routes.api_v1.endpoints.language",
@@ -34,7 +34,7 @@ class Container(containers.DeclarativeContainer):
         ]
     )
 
-    config = providers.Configuration(yaml_files=["config1.yml"])
+    config = providers.Configuration(yaml_files=["config.yml"])
 
     env_name = providers.Resource(config.core.app.env)
 
