@@ -1,12 +1,13 @@
 import logging
 from contextlib import AbstractContextManager
-from typing import Any, Callable, Dict, Generic, List, Optional, Type, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, Union
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.infrastructure.db.database import Base
+from app.infrastructure.pagination import PagedResponseSchema, paginate
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -23,17 +24,24 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.session_factory = session_factory
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
-    def get(self, id: Any) -> Optional[ModelType]:
+    def get(self, id: Any) -> PagedResponseSchema[ModelType]:
         with self.session_factory() as session:
-            return session.query(self.model).filter(self.model.id == id).first()
+            query = session.query(self.model).filter(self.model.id == id)
+            return PagedResponseSchema(
+                total=query.count(),
+                total_page=1,
+                items=[query.first()],
+            )
 
-    def query(self, query: Any, limit: int = 200) -> list[ModelType]:
+    def query(self, query: Any, page: int, size: int) -> PagedResponseSchema[ModelType]:
         with self.session_factory() as session:
-            return session.query(self.model).filter(query).limit(limit).all()
+            query = session.query(self.model).filter(query)
+            return paginate(page, size, query)
 
-    def get_multi(self, *, skip: int = 0, limit: int = 100) -> List[ModelType]:
+    def get_multi(self, page: int, size: int) -> PagedResponseSchema[ModelType]:
         with self.session_factory() as session:
-            return session.query(self.model).offset(skip).limit(limit).all()
+            query = session.query(self.model)
+            return paginate(page, size, query)
 
     def create(
         self, *, obj_in: CreateSchemaType, commit: bool = True

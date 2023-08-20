@@ -1,6 +1,7 @@
 import json
 import logging
 from datetime import datetime
+from json.decoder import JSONDecodeError
 from typing import Any
 
 from langchain import OpenAI, PromptTemplate
@@ -62,7 +63,7 @@ class ChatGPTVocabularyGenerator:
             self.logger.debug(f"Execution time: {datetime.now() - start}")
             self.logger.debug(f"Response: {response}")
             return json.loads(response)
-        except ValueError as e:
+        except JSONDecodeError as e:
             self.logger.error(e.__str__())
             raise PromptParserException()
 

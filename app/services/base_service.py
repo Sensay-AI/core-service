@@ -1,5 +1,6 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional, Union
 
+from app.infrastructure.pagination import PagedResponseSchema
 from app.repositories.base_repository import (
     BaseRepository,
     CreateSchemaType,
@@ -14,14 +15,14 @@ class BaseService:
     ) -> None:
         self._repository = repository
 
-    def get(self, model_id: Any) -> Optional[ModelType]:
+    def get(self, model_id: Any) -> PagedResponseSchema[ModelType]:
         return self._repository.get(model_id)
 
-    def query(self, query: Any, limit: int = 200) -> list[ModelType]:
-        return self._repository.query(query=query, limit=limit)
+    def query(self, query: Any, page: int, size: int) -> PagedResponseSchema[ModelType]:
+        return self._repository.query(query=query, page=page, size=size)
 
-    def get_multi(self, skip: int = 0, limit: int = 100) -> List[ModelType]:
-        return self._repository.get_multi(skip=skip, limit=limit)
+    def get_multi(self, page: int, size: int) -> PagedResponseSchema[ModelType]:
+        return self._repository.get_multi(page=page, size=size)
 
     def create(
         self, obj_in: CreateSchemaType, commit: bool = True

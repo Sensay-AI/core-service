@@ -1,8 +1,9 @@
-from typing import Any, Type
+from typing import Any
 
 from app.infrastructure.llm.vocabulary import (
     ChatGPTVocabularyGenerator,
 )
+from app.infrastructure.pagination import PagedResponseSchema
 from app.models.vocabulary import VocabularyPrompt
 from app.repositories.vocabulary_repository import VocabularyRepository
 from app.schemas.vocabulary import (
@@ -12,6 +13,7 @@ from app.schemas.vocabulary import (
     VocabularyPromptCreate,
     VocabularyQuestionCreate,
 )
+from app.services.base_service import BaseService
 
 
 def parse_json_prompt(
@@ -54,12 +56,14 @@ def parse_json_prompt(
     )
 
 
-class VocabularyService:
+class VocabularyService(BaseService):
     def __init__(
         self,
         voca_generator: ChatGPTVocabularyGenerator,
         voca_repository: VocabularyRepository,
     ):
+        super().__init__(voca_repository)
+
         self.voca_generator = voca_generator
         self.voca_repository = voca_repository
 
@@ -90,6 +94,12 @@ class VocabularyService:
         self.voca_repository.create_with_category(learning_obj, user_id)
 
     def get_history_lessons(
-        self, user_input: GetVocabularyHistoryQuestion, user_id: str
-    ) -> list[Type[VocabularyPrompt]]:
-        return self.voca_repository.get_history_questions(user_input, user_id)
+        self,
+        user_input: GetVocabularyHistoryQuestion,
+        user_id: str,
+        page: int,
+        size: int,
+    ) -> PagedResponseSchema[VocabularyPrompt]:
+        return self.voca_repository.get_history_questions(
+            user_input, user_id, page, size
+        )

@@ -11,7 +11,6 @@ class GetVocabularyQuestions(BaseModel):
 
 class GetVocabularyHistoryQuestion(BaseModel):
     category_id: int
-    limit_prompts: int = 10
     learning_language: str
 
 

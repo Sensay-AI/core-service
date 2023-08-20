@@ -1,12 +1,11 @@
 from dataclasses import dataclass
-from http import HTTPStatus
-from typing import Any, List, Optional, Type
+from typing import Any, List, Optional
 
-from fastapi import HTTPException
 from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session, joinedload
 
+from app.infrastructure.pagination import PagedResponseSchema, paginate
 from app.models.language import Language
 from app.models.vocabulary import (
     Category,
@@ -35,10 +34,7 @@ def check_language(db: Session, language_name: str) -> int:
     )
 
     if not language:
-        raise HTTPException(
-            status_code=HTTPStatus.BAD_REQUEST,
-            detail=f"{language_name.upper()} does not support yet!",
-        )
+        raise LanguageNotSupportException(language_name.upper())
     return language.id
 
 
@@ -137,10 +133,14 @@ class VocabularyRepository(
             session.commit()
 
     def get_history_questions(
-        self, question_input: GetVocabularyHistoryQuestion, user_id: str
-    ) -> list[Type[VocabularyPrompt]]:
+        self,
+        question_input: GetVocabularyHistoryQuestion,
+        user_id: str,
+        page: int,
+        size: int,
+    ) -> PagedResponseSchema[VocabularyPrompt]:
         with self.session_factory() as session:
-            prompts = (
+            query = (
                 session.query(VocabularyPrompt)
                 .join(Category)
                 .join(Language)
@@ -165,7 +165,11 @@ class VocabularyRepository(
                         VocabularyPrompt.is_valid,
                     )
                 )
-                .limit(question_input.limit_prompts)
-                .all()
+                .order_by(VocabularyPrompt.created_at.desc())
             )
-            return prompts
+            return paginate(page, size, query)
+
+
+class LanguageNotSupportException(Exception):
+    def __init__(self, language: str) -> None:
+        super().__init__(f"{language} does not support yet!")
