@@ -37,7 +37,10 @@ def check_language(db: Session, language_name: str) -> int:
     )
 
     if not language:
-        raise LanguageNotSupportException(language_name.upper())
+        language = Language(language_name=language_name.upper())
+        db.add(language)
+        db.commit()
+        db.refresh(language)
     return language.id
 
 
@@ -85,9 +88,7 @@ class VocabularyRepository(
     BaseRepository[VocabularyPrompt, VocabularyPromptCreate, Any]
 ):
     def create_with_category(
-        self,
-        prompt_create: VocabularyPromptCreate,
-        user_id: str,
+        self, prompt_create: VocabularyPromptCreate, user_id: str
     ) -> None:
         self.logger.debug("Add voca lesson to database")
         with self.session_factory() as session:
@@ -173,8 +174,3 @@ class VocabularyRepository(
                 .order_by(VocabularyPrompt.created_at.desc())
             )
             return paginate(page, size, query)
-
-
-class LanguageNotSupportException(Exception):
-    def __init__(self, language: str) -> None:
-        super().__init__(f"{language} does not support yet!")

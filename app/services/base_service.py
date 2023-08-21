@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, Optional, Union
 
 from app.models.common.pagination import PagedResponseSchema
@@ -14,6 +15,7 @@ class BaseService:
         self, repository: BaseRepository[ModelType, CreateSchemaType, UpdateSchemaType]
     ) -> None:
         self._repository = repository
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
     def get(self, model_id: Any) -> PagedResponseSchema[ModelType]:
         return self._repository.get(model_id)

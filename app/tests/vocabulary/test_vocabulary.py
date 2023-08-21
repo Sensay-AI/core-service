@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Iterator
 from unittest import mock
 
 import pytest
@@ -14,7 +14,11 @@ from app.models.schemas.vocabulary import (
 )
 from app.repositories.vocabulary_repository import VocabularyRepository
 from app.services.base_service import BaseService
-from app.services.vocabulary_service import VocabularyService, parse_json_prompt
+from app.services.vocabulary_service import (
+    PromptParserException,
+    VocabularyService,
+    parse_json_prompt,
+)
 from app.tests.utils import get_http_header, mock_user
 
 LEARNING_LANGUAGE = "english"
@@ -35,8 +39,9 @@ def mock_category() -> list[Category]:
     ]
 
 
-def mock_wrong_chat_gpt_response() -> str:
-    return """{ 
+def mock_wrong_chat_gpt_response() -> Iterator[str]:
+    return iter(
+        """{ 
         "english": { 
             "lesson": "E
                        ABCD"
@@ -61,10 +66,12 @@ def mock_wrong_chat_gpt_response() -> str:
         }
     }
     """
+    )
 
 
-def mock_chat_gpt_response() -> str:
-    return """{ 
+def mock_chat_gpt_response() -> Iterator[str]:
+    return iter(
+        """{ 
         "english": { 
             "lesson": "ABCD
                        ABCD",
@@ -89,6 +96,7 @@ def mock_chat_gpt_response() -> str:
         }
     }
     """
+    )
 
 
 def mock_questions_dict() -> list[dict[str, Any]]:
@@ -134,38 +142,16 @@ def mock_lesson_object() -> VocabularyPromptCreate:
     )
 
 
-# def test_api_new_vocabulary_questions(client):
-#     auth_service_mock = prepare_user()
-#     app.container.auth.override(auth_service_mock)
-#     voca_repo_mock = mock.Mock(spec=VocabularyRepository)
-#     app.container.vocabulary_repository.override(voca_repo_mock)
-#
-#     response = client.post(
-#         "/api/v1/lesson/vocabulary/questions",
-#         headers={
-#             "Accept": APPLICATION_JSON,
-#             "Authorization": "Bearer xyz",
-#         },
-#         json={
-#             "category": "football",
-#             "translated_language": "english",
-#             "learning_language": "vietnamese",
-#             "num_questions": 1,
-#             "num_answers": 1
-#         }
-#     )
-#     assert response.status_code == 200
-
-
 def test_func_generate_vocabulary_questions(client):
     auth_service_mock = mock_user()
     voca_repo_mock = mock.Mock(spec=VocabularyRepository)
 
     open_ai_mock = mock.Mock(spec=OpenAI)
-    open_ai_mock.predict.return_value = mock_chat_gpt_response()
+    open_ai_mock.stream.return_value = mock_chat_gpt_response()
 
     app.container.auth.override(auth_service_mock)
     app.container.vocabulary_repository.override(voca_repo_mock)
+    app.container.open_ai.override(open_ai_mock)
     payload = {
         "category": "football",
         "translated_language": "english",
@@ -174,40 +160,35 @@ def test_func_generate_vocabulary_questions(client):
         "num_questions": 1,
         "num_answers": 1,
     }
-    with app.container.open_ai.override(open_ai_mock):
-        response = client.post(
+    response = client.post(
+        "/api/v1/lesson/vocabulary/questions", headers=get_http_header(), json=payload
+    )
+    assert response.status_code == 200
+
+
+def test_prompt_parse_failed(client):
+    auth_service_mock = mock_user()
+    voca_repo_mock = mock.Mock(spec=VocabularyRepository)
+    open_ai_mock = mock.Mock(spec=OpenAI)
+    open_ai_mock.stream.return_value = mock_wrong_chat_gpt_response()
+    app.container.auth.override(auth_service_mock)
+    app.container.open_ai.override(open_ai_mock)
+    app.container.vocabulary_repository.override(voca_repo_mock)
+    payload = {
+        "category": "football",
+        "translated_language": "english",
+        "learning_language": "vietnamese",
+        "num_questions": 1,
+        "level": 1,
+        "num_answers": 1,
+    }
+    with pytest.raises(PromptParserException) as e:
+        client.post(
             "/api/v1/lesson/vocabulary/questions",
             headers=get_http_header(),
             json=payload,
         )
-    assert response.status_code == 200
-    assert "status_code" not in response.json().keys()
-
-
-# def test_prompt_parse_failed(client):
-#     auth_service_mock = mock_user()
-#     voca_repo_mock = mock.Mock(spec=VocabularyRepository)
-#
-#     open_ai_mock = mock.Mock(spec=OpenAI)
-#     open_ai_mock.predict.return_value = mock_wrong_chat_gpt_response()
-#
-#     app.container.auth.override(auth_service_mock)
-#     app.container.vocabulary_repository.override(voca_repo_mock)
-#     payload = {
-#         "category": "football",
-#         "translated_language": "english",
-#         "learning_language": "vietnamese",
-#         "num_questions": 1,
-#         "num_answers": 1,
-#     }
-#     with app.container.open_ai.override(open_ai_mock):
-#         response = client.post(
-#             "/api/v1/lesson/vocabulary/questions",
-#             headers=get_http_header(),
-#             json=payload,
-#         )
-#     assert response.status_code == 200
-#     assert "status_code" in response.json().keys()
+    assert str(e.value) == "Can not parse prompt response to json"
 
 
 def test_parse_json_prompt():

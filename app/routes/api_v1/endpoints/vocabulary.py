@@ -1,10 +1,8 @@
-from typing import Any
-
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 
 from app.container.containers import Container
-from app.infrastructure.llm.vocabulary import PromptParserException
 from app.models.common.pagination import PageParams
 from app.models.db.vocabulary import Category
 from app.models.schemas.users import Auth0User
@@ -12,10 +10,9 @@ from app.models.schemas.vocabulary import (
     GetVocabularyHistoryQuestion,
     GetVocabularyQuestions,
 )
-from app.repositories.vocabulary_repository import LanguageNotSupportException
 from app.routes.api_v1.endpoints.auth import check_user
 from app.services.base_service import BaseService
-from app.services.vocabulary_service import VocabularyService
+from app.services.vocabulary_service import PromptParserException, VocabularyService
 
 router = APIRouter()
 
@@ -31,14 +28,14 @@ async def get_new_vocabulary_questions(
     auth: Auth0User = Depends(check_user),
 ) -> object:
     try:
-        questions: dict[str, Any] = vocabulary_service.get_new_vocabulary_lessons(
-            user_id=auth.id, user_input=user_input
+        return StreamingResponse(
+            vocabulary_service.get_new_vocabulary_lessons(
+                user_id=auth.id, user_input=user_input
+            ),
+            media_type="text/plain",
         )
-        return {"items": questions}
     except PromptParserException as e:
         return HTTPException(status_code=10002, detail=e.__str__())
-    except LanguageNotSupportException as e:
-        return HTTPException(status_code=10003, detail=e.__str__())
 
 
 @router.get("/category")

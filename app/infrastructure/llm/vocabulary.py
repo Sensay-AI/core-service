@@ -1,8 +1,6 @@
-import json
 import logging
 from datetime import datetime
-from json.decoder import JSONDecodeError
-from typing import Any
+from typing import Generator
 
 from langchain import OpenAI, PromptTemplate
 
@@ -43,33 +41,24 @@ class ChatGPTVocabularyGenerator:
         num_questions: int = 4,
         num_answers: int = 5,
         level: int = 1,
-    ) -> dict[str, Any]:
-        try:
-            start = datetime.now()
-            prompt_template: PromptTemplate = PromptTemplate.from_template(
-                self._vocabulary_template, template_format="jinja2"
-            )
+    ) -> Generator:
+        start = datetime.now()
+        prompt_template: PromptTemplate = PromptTemplate.from_template(
+            self._vocabulary_template, template_format="jinja2"
+        )
+        response = ""
+        prompt = prompt_template.format(
+            category=category,
+            primary_language=translated_language,
+            learning_language=learning_language,
+            num_questions=num_questions,
+            num_answers=num_answers,
+            format_output=self._vocabulary_format,
+            level=level,
+        )
+        for text in self.model.stream(prompt):
+            response += text
+            yield text
 
-            prompt = prompt_template.format(
-                category=category,
-                primary_language=translated_language,
-                learning_language=learning_language,
-                num_questions=num_questions,
-                num_answers=num_answers,
-                format_output=self._vocabulary_format,
-                level=level,
-            )
-            response = self.model.predict(prompt)
-            response = response.replace("\\n", " ")
-            response = response.replace("\n", " ")
-            self.logger.debug(f"Execution time: {datetime.now() - start}")
-            self.logger.debug(f"Response: {response}")
-            return json.loads(response)
-        except JSONDecodeError as e:
-            self.logger.error(e.__str__())
-            raise PromptParserException()
-
-
-class PromptParserException(Exception):
-    def __init__(self) -> None:
-        super().__init__("Can not parse prompt response to json")
+        self.logger.debug(f"Execution time: {datetime.now() - start}")
+        self.logger.debug(f"Response: {response}")

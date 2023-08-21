@@ -1,4 +1,6 @@
-from typing import Any
+import json
+from json import JSONDecodeError
+from typing import Any, Generator
 
 from app.infrastructure.llm.vocabulary import (
     ChatGPTVocabularyGenerator,
@@ -69,27 +71,38 @@ class VocabularyService(BaseService):
 
     def get_new_vocabulary_lessons(
         self, user_id: str, user_input: GetVocabularyQuestions
-    ) -> dict[str, Any]:
-        questions: dict[str, Any] = self.voca_generator.generate_vocabulary_questions(
+    ) -> Generator:
+        raw_questions = ""
+        for text in self.voca_generator.generate_vocabulary_questions(
             category=user_input.category,
             translated_language=user_input.translated_language,
             learning_language=user_input.learning_language,
             num_questions=user_input.num_questions,
             num_answers=user_input.num_answers,
             level=user_input.level,
-        )
+        ):
+            raw_questions += text
+            yield text
 
-        learning_obj = parse_json_prompt(
-            user_input.category,
-            user_input.learning_language,
-            user_input.translated_language,
-            questions,
-        )
+        try:
+            raw_questions = raw_questions.replace("\\n", " ")
+            raw_questions = raw_questions.replace("\n", " ")
 
-        learning_obj.level = user_input.level
-
-        self._add_lesson_to_database(learning_obj, user_id)
-        return questions
+            questions: dict[str, Any] = json.loads(raw_questions)
+            learning_obj = parse_json_prompt(
+                user_input.category,
+                user_input.learning_language,
+                user_input.translated_language,
+                questions,
+            )
+            learning_obj.level = user_input.level
+            self._add_lesson_to_database(learning_obj, user_id)
+            questions["lesson_id"] = -1
+            # Yield with full data
+            yield questions.__str__()
+        except JSONDecodeError as e:
+            self.logger.error(e.__str__())
+            raise PromptParserException()
 
     def _add_lesson_to_database(
         self, learning_obj: VocabularyPromptCreate, user_id: str
@@ -106,3 +119,8 @@ class VocabularyService(BaseService):
         return self.voca_repository.get_history_questions(
             user_input, user_id, page, size
         )
+
+
+class PromptParserException(Exception):
+    def __init__(self) -> None:
+        super().__init__("Can not parse prompt response to json")
