@@ -22,9 +22,8 @@ class ChatGPTCaption:
         )
 
         prompt = prompt_template.format(languague=language, caption=caption)
-        response = self.model.predict(prompt)
-        response = response.replace("\\n", " ")
-        response = response.replace("\n", " ")
-        self.logger.debug(f"Execution time: {datetime.now() - start}")
-        self.logger.debug(f"Response: {response}")
-        return response
+        result: str = ""
+        for response in self.model.stream(prompt):
+            self.logger.debug(response)
+            result += response
+            yield response

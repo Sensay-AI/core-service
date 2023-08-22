@@ -10,12 +10,15 @@ class CaptionGenerator:
         self.caption_client = caption_client
         self.model_id = model_id
 
-    def generate_from_image(self, prompt: str, image_file: BytesIO) -> str:
-        caption = []
+    def generate_from_image(self,
+                            prompt: str,
+                            image_file: BytesIO
+                            ) -> str:
+        caption = ""
         output = self.caption_client.run(
             self.model_id, input={"prompt": prompt, "img": image_file}
         )
 
         for word in output:
-            caption.append(word)
-        return "".join(caption)
+            caption += word
+        return caption

@@ -45,12 +45,8 @@ class S3Service:
         return self.create_pre_signed_url(bucket_name, upload_path)
 
     def get_file(self, file_path: str, bucket_name: str) -> Any:
-        try:
-            obj = self.s3_client.get_object(Bucket=bucket_name, Key=file_path)
-            obj = obj["Body"].read()
-        except ClientError as e:
-            self.logger.error(e, exc_info=True)
-            return None
+        obj = self.s3_client.get_object(Bucket=bucket_name, Key=file_path)
+        obj = obj["Body"].read()
         return obj
 
     def create_pre_signed_url(
