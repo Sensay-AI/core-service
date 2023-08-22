@@ -4,10 +4,10 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.container.containers import Container
-from app.models.users import UserInfo
+from app.models.db.users import UserInfo
 from app.repositories.user_repository import NotFoundError, NotUniqueError
 from app.routes.api_v1.endpoints.auth import check_user
-from app.schemas.users import Auth0User, UserUpdate
+from app.models.schemas.users import Auth0User, UserUpdate
 from app.services.user_service import UserService
 
 router = APIRouter()

@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Any
+from typing import Generator
 
 from langchain import OpenAI, PromptTemplate
 
@@ -15,8 +15,7 @@ class ChatGPTCaption:
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.model = model
 
-    def rewrite_caption(self, language: str, caption: str) -> dict[str, Any]:
-        start = datetime.now()
+    def rewrite_caption(self, language: str, caption: str) -> Generator:
         prompt_template: PromptTemplate = PromptTemplate.from_template(
             self._caption_trans_template, template_format="jinja2"
         )

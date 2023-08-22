@@ -5,7 +5,7 @@ from typing import Any
 import jwt
 from fastapi import HTTPException
 
-from app.schemas.users import Auth0User
+from app.models.schemas.users import Auth0User
 
 
 def check_claims(

@@ -2,13 +2,15 @@ from io import BytesIO
 
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
+
 
 from app.container.containers import Container
 from app.infrastructure.aws.s3 import S3Service
-from app.models.image_caption import ImageCaption
+from app.models.db.image_caption import ImageCaption
 from app.routes.api_v1.endpoints.auth import check_user
-from app.schemas.image_caption import ImageCaptionRequest
-from app.schemas.users import Auth0User
+from app.models.schemas.image_caption import ImageCaptionRequest, CaptionInput
+from app.models.schemas.users import Auth0User
 from app.services.caption_service import CaptionService
 
 router = APIRouter()
@@ -29,11 +31,15 @@ def generate_caption(
         bucket_name=s3_image_bucket,
     )
     image_file = BytesIO(image_file)
-
-    caption = caption_service.get_caption_from_image(image_file, language)
-
-    new_image_caption = ImageCaption()
-    new_image_caption.user_id = auth.id
-    new_image_caption.image_url = image_url
-    new_image_caption.caption = caption
-    return caption_service.add_image_caption(new_image_caption)
+    caption_input = CaptionInput(
+        image_file=image_file,
+        image_path=image_url
+    )
+    return StreamingResponse(
+        caption_service.get_caption_from_image(
+            user_id=auth.id,
+            caption_input=caption_input,
+            language=language
+        ),
+        media_type="text/plain",
+    )

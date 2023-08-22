@@ -1,6 +1,6 @@
 from typing import Any
 
-from app.models.image_caption import ImageCaption
+from app.models.db.image_caption import ImageCaption
 from app.repositories.base_repository import BaseRepository
 
 

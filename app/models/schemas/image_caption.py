@@ -1,4 +1,10 @@
+from io import BytesIO
 from pydantic import BaseModel, Field
+
+
+class CaptionInput(BaseModel):
+    image_file: BytesIO
+    image_path: str
 
 
 class ImageCaptionRequest(BaseModel):
