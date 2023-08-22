@@ -18,11 +18,13 @@ class ChatGPTVocabularyGenerator:
             }"""
 
     _vocabulary_template = """
-            Create a prompt lesson more than 100 words about {{ category }} in level {{ level }} and suggest {{ num_questions }} vocabulary 
-            to learn {{ learning_language }} in multiple-choice format with {{ num_answers }} answers, 
-            display the answer for each question  and translate to {{ primary_language }}
-            Do not include any explanations, only provide a RFC8259 compliant JSON response following 
-            this format without deviation, the lesson must not include a newline and special characters:
+            Create a prompt lesson more than 100 words about {{ category }} with difficult in level {{ level }} and suggest {{ num_questions }} vocabulary 
+            to learn {{ learning_language }} in multiple-choice format with {{ num_answers }} options, 
+            display the answer for each question , make sure the questions make sense, the answer exists in {{ num_answers }} options and translate to {{ primary_language }}
+            Do not include any explanations, the lesson must not include a newline and special character and do not 
+            return anything in your response outside of curly braces. Only provide a RFC8259 compliant JSON response 
+            following this format without deviation:
+            
             {
                     "{{ learning_language }}": {{ format_output }},
                     "{{ primary_language }}": {{ format_output }}
@@ -56,6 +58,8 @@ class ChatGPTVocabularyGenerator:
             format_output=self._vocabulary_format,
             level=level,
         )
+
+        self.logger.debug(f"Request: {prompt}")
         for text in self.model.stream(prompt):
             response += text
             yield text

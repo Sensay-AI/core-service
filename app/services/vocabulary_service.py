@@ -85,10 +85,12 @@ class VocabularyService(BaseService):
             yield text
 
         try:
+            self.logger.debug("Streaming process done")
             raw_questions = raw_questions.replace("\\n", " ")
             raw_questions = raw_questions.replace("\n", " ")
 
             questions: dict[str, Any] = json.loads(raw_questions)
+            self.logger.debug("Try to parse plan text to object")
             learning_obj = parse_json_prompt(
                 user_input.category,
                 user_input.learning_language,
@@ -107,6 +109,7 @@ class VocabularyService(BaseService):
     def _add_lesson_to_database(
         self, learning_obj: VocabularyPromptCreate, user_id: str
     ) -> None:
+        self.logger.debug("Add lesson to database")
         self.voca_repository.create_with_category(learning_obj, user_id)
 
     def get_history_lessons(

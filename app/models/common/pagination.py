@@ -1,3 +1,4 @@
+import math
 from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel
@@ -22,9 +23,10 @@ class PagedResponseSchema(GenericModel, Generic[T]):
 
 def paginate(page: int, size: int, query: Any) -> PagedResponseSchema:
     paginated_query = query.offset((page - 1) * size).limit(size).all()
+    total_records = query.count()
     return PagedResponseSchema(
-        total=query.count(),
-        total_page=max(query.count() // size, 1),
+        total=total_records,
+        total_page=max(math.ceil(total_records / size), 1),
         page=page,
         size=size,
         items=paginated_query,

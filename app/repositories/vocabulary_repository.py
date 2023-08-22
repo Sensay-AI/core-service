@@ -90,7 +90,7 @@ class VocabularyRepository(
     def create_with_category(
         self, prompt_create: VocabularyPromptCreate, user_id: str
     ) -> None:
-        self.logger.debug("Add voca lesson to database")
+        self.logger.debug("Create voca lesson with category")
         with self.session_factory() as session:
             stmt = (
                 insert(Category)
