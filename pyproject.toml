@@ -15,29 +15,9 @@ authors = [
     { name = "Tri Tran", email = "tri.trancongtoan@gmail.com" },
     { name = "Binh Pham", email = "bnh.quang@gmail.com" }
 ]
-dependencies = [
-    "bcrypt",
-    "fastapi",
-    "passlib",
-    "python-multipart",
-    "uvicorn",
-    "gunicorn",
-]
-
-[project.optional-dependencies]
-dev = [
-    "black",
-    "httpx",
-    "mypy",
-    "pip-tools",
-    "pytest-cov",
-    "ruff",
-    "pytest",
-    "requests" # Required by fastapi-test.
-]
 
 [project.urls]
-Repository = "https://github.com/rednafi/fastapi-nano.git"
+Repository = "https://github.com/Sensay-AI/core-service"
 
 #################################################
 # Mypy config
