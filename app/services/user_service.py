@@ -1,4 +1,4 @@
-from app.models.users import UserInfo
+from app.models.db.users import UserInfo
 from app.repositories.user_repository import UserRepository
 
 

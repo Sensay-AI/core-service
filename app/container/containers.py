@@ -7,12 +7,20 @@ import sentry_sdk
 from botocore.client import BaseClient
 from dependency_injector import containers, providers
 from dependency_injector.providers import Resource
+from langchain.llms import OpenAI
 
 from app.infrastructure.auth0.auth0 import Auth0Service
 from app.infrastructure.aws.s3 import S3Service
 from app.infrastructure.db.database import Database
+from app.infrastructure.llm.vocabulary import ChatGPTVocabularyGenerator
+from app.models.db.language import Language
+from app.models.db.vocabulary import Category, VocabularyPrompt
+from app.repositories.base_repository import BaseRepository
 from app.repositories.user_repository import UserRepository
+from app.repositories.vocabulary_repository import VocabularyRepository
+from app.services.base_service import BaseService
 from app.services.user_service import UserService
+from app.services.vocabulary_service import VocabularyService
 
 
 class Container(containers.DeclarativeContainer):
@@ -21,6 +29,8 @@ class Container(containers.DeclarativeContainer):
             "app.routes.api_v1.endpoints.image_upload",
             "app.routes.api_v1.endpoints.user",
             "app.routes.api_v1.endpoints.auth",
+            "app.routes.api_v1.endpoints.language",
+            "app.routes.api_v1.endpoints.vocabulary",
         ]
     )
 
@@ -92,3 +102,38 @@ class Container(containers.DeclarativeContainer):
     s3_image_bucket = providers.Resource(
         config.infrastructures.aws.s3_image_bucket[env_name]
     )
+
+    open_ai: OpenAI = providers.Singleton(
+        OpenAI,
+        openai_api_key=config.infrastructures.open_ai.openai_api_key,
+        max_tokens=config.infrastructures.open_ai.max_tokens,
+        temperature=config.infrastructures.open_ai.temperature,
+    )
+
+    chatGPT_vocabulary_generator = providers.Singleton(
+        ChatGPTVocabularyGenerator, model=open_ai
+    )
+
+    language_repository = providers.Factory(
+        BaseRepository, model=Language, session_factory=db.provided.session
+    )
+
+    category_repository = providers.Factory(
+        BaseRepository, model=Category, session_factory=db.provided.session
+    )
+
+    vocabulary_repository = providers.Factory(
+        VocabularyRepository,
+        model=VocabularyPrompt,
+        session_factory=db.provided.session,
+    )
+
+    vocabulary_service = providers.Factory(
+        VocabularyService,
+        voca_generator=chatGPT_vocabulary_generator,
+        voca_repository=vocabulary_repository,
+    )
+
+    category_service = providers.Factory(BaseService, repository=category_repository)
+
+    language_service = providers.Factory(BaseService, repository=language_repository)

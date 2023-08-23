@@ -6,7 +6,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.container.containers import Container
 from app.infrastructure.auth0.auth0 import Auth0Service
-from app.schemas.users import Auth0User
+from app.models.schemas.users import Auth0User
 
 logger = logging.getLogger()
 router = APIRouter()
