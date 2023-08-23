@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 from typing import Generator
 
 from langchain import OpenAI, PromptTemplate

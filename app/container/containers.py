@@ -15,6 +15,7 @@ from app.infrastructure.aws.s3 import S3Service
 from app.infrastructure.captions.replicate_caption import CaptionGenerator
 from app.infrastructure.db.database import Database
 from app.infrastructure.llm.caption import ChatGPTCaption
+from app.models.db.image_caption import ImageCaption
 from app.repositories.caption_repository import CaptionRepository
 from app.repositories.user_repository import UserRepository
 from app.services.caption_service import CaptionService
@@ -25,6 +26,7 @@ class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
         modules=[
             "app.routes.api_v1.endpoints.image_upload",
+            "app.routes.api_v1.endpoints.image_caption",
             "app.routes.api_v1.endpoints.user",
             "app.routes.api_v1.endpoints.auth",
         ]
@@ -114,15 +116,15 @@ class Container(containers.DeclarativeContainer):
         max_tokens=config.infrastructures.open_ai.max_tokens,
     )
 
-    chatgpt_caption = providers.Singleton(ChatGPTCaption, model=open_ai)
-
     image_caption_repository = providers.Factory(
-        CaptionRepository, session_factory=db.provided.session
+        CaptionRepository, model=ImageCaption, session_factory=db.provided.session
     )
+
+    chatgpt_caption = providers.Singleton(ChatGPTCaption, model=open_ai)
 
     caption_service = providers.Factory(
         CaptionService,
         image_caption_repository=image_caption_repository,
         caption_generator=caption_generator,
-        chatgpt_caption=chatgpt_caption
+        chatgpt_caption=chatgpt_caption,
     )

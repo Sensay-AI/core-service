@@ -1,12 +1,11 @@
 from typing import Any
 
 from app.models.db.image_caption import ImageCaption
+from app.models.schemas.image_caption import ImageCaptionRequest
 from app.repositories.base_repository import BaseRepository
 
 
-class CaptionRepository(
-    BaseRepository[ImageCaption, Any]
-):
+class CaptionRepository(BaseRepository[ImageCaption, ImageCaptionRequest, Any]):
     def add_image_caption(self, image_caption: ImageCaption) -> ImageCaption | None:
         with self.session_factory() as session:
             session.add(image_caption)

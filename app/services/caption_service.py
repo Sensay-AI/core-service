@@ -1,21 +1,18 @@
-from io import BytesIO
 from typing import Generator
 
-from app.repositories.caption_repository import CaptionRepository
 from app.infrastructure.captions.replicate_caption import CaptionGenerator
 from app.infrastructure.llm.caption import ChatGPTCaption
-from app.models.schemas.image_caption import CaptionInput
-from app.services.base_service import BaseService
 from app.models.db.image_caption import ImageCaption
+from app.repositories.caption_repository import CaptionRepository
+from app.services.base_service import BaseService
 
 
 class CaptionService(BaseService):
     def __init__(
-            self,
-            image_caption_repository: CaptionRepository,
-            caption_generator: CaptionGenerator,
-            chatgpt_caption: ChatGPTCaption,
-
+        self,
+        image_caption_repository: CaptionRepository,
+        caption_generator: CaptionGenerator,
+        chatgpt_caption: ChatGPTCaption,
     ) -> None:
         super().__init__(image_caption_repository)
         self._repository: CaptionRepository = image_caption_repository
@@ -26,13 +23,11 @@ class CaptionService(BaseService):
         return self._repository.add_image_caption(image_caption)
 
     def get_caption_from_image(
-            self,
-            user_id: str,
-            caption_input: CaptionInput,
-            language: str
+        self, user_id: str, caption_input: dict, language: str
     ) -> Generator:
         caption = self.caption_generator.generate_from_image(
-            prompt="Generate a caption for the following image", image_file=caption_input.image_file
+            prompt="Generate a caption for the following image",
+            image_file=caption_input["file"],
         )
         rewritten_caption = ""
         for text in self.chatgpt_caption.rewrite_caption(
@@ -41,8 +36,6 @@ class CaptionService(BaseService):
             rewritten_caption += text
             yield text
         new_image_caption = ImageCaption(
-            user_id=user_id,
-            image_url=caption_input.image_path,
-            caption=rewritten_caption
+            user_id=user_id, image_url=caption_input["path"], caption=rewritten_caption
         )
         self.add_image_caption(new_image_caption)
