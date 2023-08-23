@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.infrastructure.auth0.auth0 import Auth0Service
-from app.infrastructure.aws.s3 import S3Service
+from app.infrastructure.aws.s3 import S3Service, UploadS3FileResponse
 from app.main import app
 from app.models.schemas.users import Auth0User
 
@@ -19,7 +19,9 @@ def client():
 
 def test_upload_image(client):
     s3_service_mock = mock.Mock(spec=S3Service)
-    s3_service_mock.upload_file.return_value = "http://s3.image.jng"
+    s3_service_mock.upload_file.return_value = UploadS3FileResponse(
+        "s3/bucket/path/key", "http://s3.image.jng"
+    )
 
     auth_service_mock = mock.Mock(spec=Auth0Service)
     auth_service_mock.verify_token.return_value = Auth0User(
@@ -43,7 +45,10 @@ def test_upload_image(client):
         )
 
     assert response.status_code == 200
-    assert response.json() == {"upload_path": "http://s3.image.jng"}
+    assert response.json() == {
+        "full_url": "http://s3.image.jng",
+        "s3_bucket_path_key": "s3/bucket/path/key",
+    }
     s3_service_mock.upload_file.assert_called_once_with(
         file=mock.ANY,
         bucket_name=mock.ANY,
