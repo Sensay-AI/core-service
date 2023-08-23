@@ -39,7 +39,9 @@ def mock_replicate_caption_response() -> Iterator[str]:
 
 
 def test_generate_caption(client):
-    image_path = os.path.join(os.path.dirname(__file__), "../zzz/test_image.jpg")
+    image_path = os.path.join(
+        os.path.dirname(__file__), "../image_caption/test_image.jpg"
+    )
     test_image = open(image_path, "rb")
 
     auth_service_mock = mock.Mock(spec=Auth0Service)
