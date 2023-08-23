@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, Union
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from sqlalchemy.sql.elements import UnaryExpression
 
 from app.infrastructure.db.database import Base
 from app.models.common.pagination import PagedResponseSchema, paginate
@@ -33,14 +34,28 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 items=[query.first()],
             )
 
-    def query(self, query: Any, page: int, size: int) -> PagedResponseSchema[ModelType]:
+    def query(
+        self,
+        query: Any,
+        page: int,
+        size: int,
+        sort_by: Optional[UnaryExpression[Any]] = None,
+    ) -> PagedResponseSchema[ModelType]:
         with self.session_factory() as session:
-            query = session.query(self.model).filter(query)
+            if sort_by is not None:
+                query = session.query(self.model).filter(query).order_by(sort_by)
+            else:
+                query = session.query(self.model).filter(query)
             return paginate(page, size, query)
 
-    def get_multi(self, page: int, size: int) -> PagedResponseSchema[ModelType]:
+    def get_multi(
+        self, page: int, size: int, sort_by: Optional[UnaryExpression[Any]] = None
+    ) -> PagedResponseSchema[ModelType]:
         with self.session_factory() as session:
-            query = session.query(self.model)
+            if sort_by is not None:
+                query = session.query(self.model).order_by(sort_by)
+            else:
+                query = session.query(self.model)
             return paginate(page, size, query)
 
     def create(

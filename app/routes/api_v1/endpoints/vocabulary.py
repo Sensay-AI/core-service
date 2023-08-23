@@ -47,7 +47,10 @@ async def list_categories(
     auth: Auth0User = Depends(check_user),
 ) -> object:
     return category_service.query(
-        query=Category.user_id == auth.id, page=page_params.page, size=page_params.size
+        query=Category.user_id == auth.id,
+        page=page_params.page,
+        size=page_params.size,
+        sort_by=Category.created_at.desc(),
     )
 
 
