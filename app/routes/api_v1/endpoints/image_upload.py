@@ -50,7 +50,10 @@ async def upload_image_to_s3(
         extension=file_extension,
     )
     if result:
-        return {"upload_path": result}
+        return {
+            "full_url": result.full_url,
+            "s3_bucket_path_key": result.s3_bucket_path_key,
+        }
     raise HTTPException(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         detail="We have an error uploading files",

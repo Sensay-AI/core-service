@@ -1,9 +1,16 @@
 import hashlib
 import logging
+from dataclasses import dataclass
 from io import BytesIO
 
 from boto3_type_annotations.s3 import Client
 from botocore.exceptions import ClientError
+
+
+@dataclass
+class UploadS3FileResponse:
+    s3_bucket_path_key: str
+    full_url: str
 
 
 class S3Service:
@@ -24,12 +31,14 @@ class S3Service:
 
     def upload_file(
         self, file: BytesIO, user_id: str, bucket_name: str, extension: str
-    ) -> str | None:
+    ) -> UploadS3FileResponse | None:
         hashed_name = hashlib.sha256(file.read()).hexdigest()
         upload_path = f"user/{user_id}/{hashed_name}{extension}"
         path = self.get_file_path(bucket_name, upload_path)
         if path:
-            return self.create_pre_signed_url(bucket_name, upload_path)
+            return UploadS3FileResponse(
+                upload_path, self.create_pre_signed_url(bucket_name, upload_path)
+            )
         file.seek(0)
         self.s3_client.upload_fileobj(
             file,
@@ -41,28 +50,25 @@ class S3Service:
             upload_path,
             user_id,
         )
-        return self.create_pre_signed_url(bucket_name, upload_path)
+
+        return UploadS3FileResponse(
+            upload_path, self.create_pre_signed_url(bucket_name, upload_path)
+        )
 
     def create_pre_signed_url(
         self, bucket_name: str, object_name: str, expiration: int = 3600
-    ) -> str | None:
+    ) -> str:
         """Generate a preSigned URL to share an S3 object
         :param bucket_name: string
         :param object_name: string
         :param expiration: Time in seconds for the presigned URL to remain valid
         :return: Presigned URL as string. If error, returns None.
         """
-
         # Generate a preSigned URL for the S3 object
-        try:
-            response = self.s3_client.generate_presigned_url(
-                "get_object",
-                Params={"Bucket": bucket_name, "Key": object_name},
-                ExpiresIn=expiration,
-            )
-        except ClientError as e:
-            self.logger.error(e)
-            return None
-
+        response = self.s3_client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": bucket_name, "Key": object_name},
+            ExpiresIn=expiration,
+        )
         # The response contains the preSigned URL
         return response
