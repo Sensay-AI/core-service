@@ -1,3 +1,4 @@
+import json
 from typing import Any, Iterator
 from unittest import mock
 
@@ -67,6 +68,9 @@ def mock_wrong_chat_gpt_response() -> Iterator[str]:
     }
     """
     )
+
+
+test_data_chat_gpt_response_in_byte = b"{ \n        \"english\": { \n            \"lesson\": \"ABCD\n                       ABCD\",\n                \"questions\": [\n                    {\n                    \"question\": \"What is the term used for a person who runs in a race?\",\n                    \"options\": [\"Swimmer\", \"Runner\", \"Cyclist\", \"Skater\"],\n                    \"answer\": \"Runner\"\n                    }\n                ]\n                },\n        \"vietnamese\": {\n                    \"lesson\": \"ABCD\n                               ABCD\",\n                \"questions\": [\n                    {\n                    \"question\": \"What is the term used for a person who runs in a race?\",\n                    \"options\": [\"Swimmer\", \"Runner\", \"Cyclist\", \"Skater\"],\n                    \"answer\": \"Runner\"\n                    }\n                ]\n        }\n    }\n    {'english': {'lesson': 'ABCD                        ABCD', 'questions': [{'question': 'What is the term used for a person who runs in a race?', 'options': ['Swimmer', 'Runner', 'Cyclist', 'Skater'], 'answer': 'Runner'}]}, 'vietnamese': {'lesson': 'ABCD                                ABCD', 'questions': [{'question': 'What is the term used for a person who runs in a race?', 'options': ['Swimmer', 'Runner', 'Cyclist', 'Skater'], 'answer': 'Runner'}]}, 'lesson_id': -1}"
 
 
 def mock_chat_gpt_response() -> Iterator[str]:
@@ -161,8 +165,9 @@ def test_func_generate_vocabulary_questions(client):
         "num_answers": 1,
     }
     response = client.post(
-        "/api/v1/lesson/vocabulary/questions", headers=get_http_header(), json=payload
+        "/api/v1/lesson/vocabulary/question", headers=get_http_header(), json=payload
     )
+    assert response.content == test_data_chat_gpt_response_in_byte
     assert response.status_code == 200
 
 
@@ -184,7 +189,7 @@ def test_prompt_parse_failed(client):
     }
     with pytest.raises(PromptParserException) as e:
         client.post(
-            "/api/v1/lesson/vocabulary/questions",
+            "/api/v1/lesson/vocabulary/question",
             headers=get_http_header(),
             json=payload,
         )
@@ -210,9 +215,13 @@ def test_get_category(client):
     app.container.category_service.override(category_service_mock)
 
     response = client.get(
-        "/api/v1/lesson/vocabulary/category", headers=get_http_header()
+        "/api/v1/lesson/vocabulary/categories", headers=get_http_header()
     )
+    json_result = json.loads(response.content)
     assert response.status_code == 200
+    assert len(json_result) == 2
+    assert json_result[0]["category_name"] == "football"
+    assert json_result[1]["category_name"] == "movie"
 
 
 def test_get_history_question(client):
@@ -224,9 +233,11 @@ def test_get_history_question(client):
     app.container.auth.override(auth_service_mock)
     app.container.vocabulary_service.override(vocabulary_service_mock)
 
-    response = client.post(
-        "/api/v1/lesson/vocabulary/category/history/questions",
+    response = client.get(
+        "/api/v1/lesson/vocabulary/category/1/learning_language/english/questions?page=1&size=5",
         headers=get_http_header(),
-        json={"category_id": 1, "limit_prompts": 10, "learning_language": "english"},
     )
+    json_result = json.loads(response.content)
+
     assert response.status_code == 200
+    assert len(json_result) == 0

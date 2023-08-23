@@ -17,9 +17,9 @@ from app.services.vocabulary_service import PromptParserException, VocabularySer
 router = APIRouter()
 
 
-@router.post("/questions")
+@router.post("/question")
 @inject
-async def get_new_vocabulary_questions(
+async def create_vocabulary_question(
     *,
     user_input: GetVocabularyQuestions,
     vocabulary_service: VocabularyService = Depends(
@@ -38,9 +38,9 @@ async def get_new_vocabulary_questions(
         return HTTPException(status_code=10002, detail=e.__str__())
 
 
-@router.get("/category")
+@router.get("/categories")
 @inject
-async def get_user_categories(
+async def list_categories(
     *,
     page_params: PageParams = Depends(),
     category_service: BaseService = Depends(Provide[Container.category_service]),
@@ -51,16 +51,20 @@ async def get_user_categories(
     )
 
 
-@router.post("/category/history/questions")
+@router.get("/category/{category_id}/learning_language/{learning_language}/questions")
 @inject
-async def get_history_question_by_category(
-    user_input: GetVocabularyHistoryQuestion,
+async def list_questions(
+    category_id: int,
+    learning_language: str,
     page_params: PageParams = Depends(),
     vocabulary_service: VocabularyService = Depends(
         Provide[Container.vocabulary_service]
     ),
     auth: Auth0User = Depends(check_user),
 ) -> object:
+    user_input = GetVocabularyHistoryQuestion(
+        category_id=category_id, learning_language=learning_language
+    )
     return vocabulary_service.get_history_lessons(
         user_id=auth.id,
         user_input=user_input,
