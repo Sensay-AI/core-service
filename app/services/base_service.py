@@ -1,6 +1,8 @@
 import logging
 from typing import Any, Dict, Optional, Union
 
+from sqlalchemy.sql.elements import UnaryExpression
+
 from app.models.common.pagination import PagedResponseSchema
 from app.repositories.base_repository import (
     BaseRepository,
@@ -20,11 +22,21 @@ class BaseService:
     def get(self, model_id: Any) -> PagedResponseSchema[ModelType]:
         return self._repository.get(model_id)
 
-    def query(self, query: Any, page: int, size: int) -> PagedResponseSchema[ModelType]:
-        return self._repository.query(query=query, page=page, size=size)
+    def query(
+        self,
+        query: Any,
+        page: int,
+        size: int,
+        sort_by: Optional[UnaryExpression[Any]] = None,
+    ) -> PagedResponseSchema[ModelType]:
+        return self._repository.query(
+            query=query, page=page, size=size, sort_by=sort_by
+        )
 
-    def get_multi(self, page: int, size: int) -> PagedResponseSchema[ModelType]:
-        return self._repository.get_multi(page=page, size=size)
+    def get_multi(
+        self, page: int, size: int, sort_by: Optional[UnaryExpression[Any]] = None
+    ) -> PagedResponseSchema[ModelType]:
+        return self._repository.get_multi(page=page, size=size, sort_by=sort_by)
 
     def create(
         self, obj_in: CreateSchemaType, commit: bool = True

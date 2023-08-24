@@ -30,10 +30,10 @@ def create_app() -> FastAPI:
     container.config()
     container.logging()
     logger.debug("START create_app FastAPI")
-    db = container.db()
+    container.db()
     container.auth()
     container.sentry_sdk()
-    db.create_database()
+    # db.create_database()
     container.init_resources()
 
     fast_api_app = FastAPI()
