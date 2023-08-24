@@ -24,17 +24,21 @@ def generate_caption(
     caption_service: CaptionService = Depends(Provide[Container.caption_service]),
 ) -> object:
     print(s3_service)
-    language = input_data.language
     image_url = input_data.image_url
     image_file = s3_service.get_file(
         file_path=image_url,
         bucket_name=s3_image_bucket,
     )
     image_file = BytesIO(image_file)
-    caption_input = {"file": image_file, "path": image_url}
+    caption_input = {
+        "file": image_file,
+        "path": image_url,
+        **input_data
+    }
     return StreamingResponse(
         caption_service.get_caption_from_image(
-            user_id=auth.id, caption_input=caption_input, language=language
+            user_id=auth.id,
+            caption_input=caption_input
         ),
         media_type="text/plain",
     )

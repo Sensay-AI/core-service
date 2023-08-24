@@ -1,3 +1,4 @@
+import json
 from typing import Generator
 
 from app.infrastructure.captions.replicate_caption import CaptionGenerator
@@ -23,7 +24,7 @@ class CaptionService(BaseService):
         return self._repository.add_image_caption(image_caption)
 
     def get_caption_from_image(
-        self, user_id: str, caption_input: dict, language: str
+        self, user_id: str, caption_input: dict
     ) -> Generator:
         caption = self.caption_generator.generate_from_image(
             prompt="Generate a caption for the following image",
@@ -31,11 +32,17 @@ class CaptionService(BaseService):
         )
         rewritten_caption = ""
         for text in self.chatgpt_caption.rewrite_caption(
-            caption=caption, language=language
+            caption=caption,
+            primary_language=caption_input['primary_language'],
+            learning_language=caption_input['learning_language']
         ):
             rewritten_caption += text
             yield text
+        caption_data = json.loads(rewritten_caption)
         new_image_caption = ImageCaption(
-            user_id=user_id, image_url=caption_input["path"], caption=rewritten_caption
+            user_id=user_id,
+            image_url=caption_input["path"],
+            caption_learning_language=caption_data['learning_language'],
+            caption_primary_language=caption_data['primary_language']
         )
         self.add_image_caption(new_image_caption)
