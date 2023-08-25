@@ -2,8 +2,8 @@ from fastapi import APIRouter
 
 from app.routes.api_v1.endpoints import (
     auth,
-    image_upload,
     image_caption,
+    image_upload,
     language,
     user,
     vocabulary,

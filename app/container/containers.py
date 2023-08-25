@@ -15,17 +15,16 @@ from app.infrastructure.aws.s3 import S3Service
 from app.infrastructure.captions.replicate_caption import CaptionGenerator
 from app.infrastructure.db.database import Database
 from app.infrastructure.llm.caption import ChatGPTCaption
-from app.models.db.image_caption import ImageCaption
-from app.repositories.caption_repository import CaptionRepository
-from app.repositories.user_repository import UserRepository
-from app.services.caption_service import CaptionService
 from app.infrastructure.llm.vocabulary import ChatGPTVocabularyGenerator
+from app.models.db.image_caption import ImageCaption
 from app.models.db.language import Language
 from app.models.db.vocabulary import Category, VocabularyPrompt
 from app.repositories.base_repository import BaseRepository
+from app.repositories.caption_repository import CaptionRepository
 from app.repositories.user_repository import UserRepository
 from app.repositories.vocabulary_repository import VocabularyRepository
 from app.services.base_service import BaseService
+from app.services.caption_service import CaptionService
 from app.services.user_service import UserService
 from app.services.vocabulary_service import VocabularyService
 
@@ -58,7 +57,6 @@ class Container(containers.DeclarativeContainer):
         traces_sample_rate=1.0,
         environment=env_name,
     )
-
     db = providers.Singleton(Database, db_url=config.infrastructures.db.url)
 
     auth = providers.Singleton(
@@ -112,12 +110,12 @@ class Container(containers.DeclarativeContainer):
     )
 
     caption_client: Resource[Client] = providers.Resource(
-        Client, api_token=config.infrastructures.captions.replicate.access_token
+        Client, api_token=config.infrastructures.caption.replicate.access_token
     )
 
     caption_generator = providers.Singleton(
         CaptionGenerator,
-        model_id=config.infrastructures.captions.replicate.model_id,
+        model_id=config.infrastructures.caption.replicate.caption_model.model_id,
         caption_client=caption_client,
     )
     open_ai: OpenAI = providers.Singleton(
@@ -139,7 +137,7 @@ class Container(containers.DeclarativeContainer):
         caption_generator=caption_generator,
         chatgpt_caption=chatgpt_caption,
     )
-        
+
     chatGPT_vocabulary_generator = providers.Singleton(
         ChatGPTVocabularyGenerator, model=open_ai
     )

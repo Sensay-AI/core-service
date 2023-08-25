@@ -9,25 +9,24 @@ core:
 
 infrastructures:
   open_ai:
-    openai_api_key: ${OPENAI_API_KEY}
+    openai_api_key: ${OPENAI_API_KEY:"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"}
+    model_name: ${OPENAI_MODEL_NAME:"gpt-3.5-turbo"}
     max_tokens: ${OPENAI_MAX_TOKENS:"-1"}
     temperature: ${OPENAI_TEMPERATURE:"0.5"}
   aws:
-    access_key_id: ${AWS_ACCESS_KEY_ID}
-    secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+    access_key_id: ${AWS_ACCESS_KEY_ID:"AKIA3IGDTMXV2E3TS4M4"}
+    secret_access_key: ${AWS_SECRET_ACCESS_KEY:"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"}
     s3_image_bucket:
       production: "sensayai-images"
       development: "sensayai-images-dev"
       local: "sensayai-images-local"
-  open_ai:
-    openai_api_key: ${OPENAI_API_KEY}
-    max_tokens: ${OPENAI_MAX_TOKENS:"-1"}
   caption:
     replicate:
-      access_token: ${REPLICATE_TOKEN}
-      model_id: "joehoover/mplug-owl:51a43c9d00dfd92276b2511b509fcb3ad82e221f6a9e5806c54e69803e291d6b"
+      access_token: ${REPLICATE_TOKEN:"r8_Vtzy20N3tkqBxv1JkOxHOKqTmJ7cWW44G5ZQa"}
+      caption_model:
+        model_id: ${REPLICATE_MODEL:"salesforce/blip:2e1dddc8621f72155f24cf2e0adbde548458d3cab9f00c0139eea840d0ac4746"}
   db:
-    url: ${DB_URL}
+    url: ${DB_URL:"postgresql+psycopg2://postgres:dickbutt@localhost/postgres"}
   auth0:
     domain: "dev-kpookvh6nj230wwk.us.auth0.com"
     audience: "https://dev-kpookvh6nj230wwk.us.auth0.com/api/v2/"
