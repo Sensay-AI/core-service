@@ -1,14 +1,18 @@
 import io
 import pathlib
 from http import HTTPStatus
-from typing import Dict
+from typing import Dict, List
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from PIL import Image, UnidentifiedImageError
 
 from app.container.containers import Container
-from app.infrastructure.aws.s3 import S3Service
+from app.infrastructure.aws.s3 import (
+    S3FilesInFolderResponse,
+    S3Service,
+    UploadS3FileResponse,
+)
 from app.models.schemas.users import Auth0User
 from app.routes.api_v1.endpoints.auth import check_user
 
@@ -16,14 +20,14 @@ from app.routes.api_v1.endpoints.auth import check_user
 router = APIRouter()
 
 
-@router.post("/upload")
+@router.post("")
 @inject
 async def upload_image_to_s3(
     image_file: UploadFile,
     auth: Auth0User = Depends(check_user),
     s3_service: S3Service = Depends(Provide[Container.s3_service]),
     s3_image_bucket: str = Depends(Provide[Container.s3_image_bucket]),
-) -> Dict[str, str]:
+) -> UploadS3FileResponse:
     file_extension = pathlib.Path(image_file.filename).suffix
     if file_extension not in [".png", ".jpg", ".jpeg"]:
         raise HTTPException(
@@ -50,11 +54,23 @@ async def upload_image_to_s3(
         extension=file_extension,
     )
     if result:
-        return {
-            "full_url": result.full_url,
-            "s3_bucket_path_key": result.s3_bucket_path_key,
-        }
+        return result
     raise HTTPException(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         detail="We have an error uploading files",
     )
+
+
+@router.get("")
+@inject
+async def get_user_uploaded_images(
+    auth: Auth0User = Depends(check_user),
+    s3_service: S3Service = Depends(Provide[Container.s3_service]),
+    s3_image_bucket: str = Depends(Provide[Container.s3_image_bucket]),
+) -> Dict[str, List[S3FilesInFolderResponse]]:
+    return {
+        "items": s3_service.list_s3_files_in_folder(
+            bucket_name=s3_image_bucket,
+            user_id=auth.id,
+        )
+    }
