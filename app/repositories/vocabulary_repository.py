@@ -6,6 +6,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.common.pagination import PagedResponseSchema, paginate
+from app.models.db.difficulty_levels import DifficultyLevels
 from app.models.db.language import Language
 from app.models.db.vocabulary import (
     Category,
@@ -33,6 +34,20 @@ class QuestionWithAnswers:
 class CreateWithCategoryResponse:
     category_id: int
     learning_language: str
+
+
+def check_difficulty_lesson(db: Session, difficult_name: str) -> int:
+    difficult_level: Optional[DifficultyLevels] = (
+        db.query(DifficultyLevels)
+        .filter(DifficultyLevels.name == difficult_name.upper())
+        .first()
+    )
+    if not difficult_level:
+        difficult_level = DifficultyLevels(name=difficult_name.upper())
+        db.add(difficult_level)
+        db.commit()
+        db.refresh(difficult_level)
+    return difficult_level.id
 
 
 def check_language(db: Session, language_name: str) -> int:
@@ -117,10 +132,14 @@ class VocabularyRepository(
                 session, prompt_create.translated_language
             )
 
+            difficult_level_id = check_difficulty_lesson(
+                session, prompt_create.difficulty_level
+            )
+
             prompt_obj = VocabularyPrompt(
                 prompt=prompt_create.prompt,
                 category_id=insert_id,
-                level=prompt_create.level,
+                difficulty_level_id=difficult_level_id,
                 language_id=learning_language_id,
             )
 
@@ -160,8 +179,10 @@ class VocabularyRepository(
                 session.query(VocabularyPrompt)
                 .join(Category)
                 .join(Language)
+                .join(DifficultyLevels)
                 .options(
                     joinedload(VocabularyPrompt.language),
+                    joinedload(VocabularyPrompt.difficulty_level),
                     joinedload(VocabularyPrompt.translations).joinedload(
                         VocabularyPromptTranslation.translated_language
                     ),

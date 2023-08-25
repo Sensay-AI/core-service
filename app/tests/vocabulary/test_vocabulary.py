@@ -140,6 +140,7 @@ def mock_lesson_object() -> VocabularyPromptCreate:
         learning_language=LEARNING_LANGUAGE,
         translated_language=TRANSLATED_LANGUAGE,
         translation="prompt",
+        difficulty_level="EASY",
     )
 
 
@@ -194,7 +195,7 @@ def test_prompt_parse_failed(client):
 
 def test_parse_json_prompt():
     input_obj = parse_json_prompt(
-        CATEGORY, LEARNING_LANGUAGE, TRANSLATED_LANGUAGE, mock_lesson_dict()
+        CATEGORY, LEARNING_LANGUAGE, TRANSLATED_LANGUAGE, mock_lesson_dict(), "EASY"
     )
     output_obj = mock_lesson_object()
 
