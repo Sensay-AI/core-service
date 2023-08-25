@@ -2,6 +2,7 @@ import hashlib
 import logging
 from dataclasses import dataclass
 from io import BytesIO
+from typing import List
 
 from boto3_type_annotations.s3 import Client
 from botocore.exceptions import ClientError
@@ -11,6 +12,13 @@ from botocore.exceptions import ClientError
 class UploadS3FileResponse:
     s3_bucket_path_key: str
     full_url: str
+
+
+@dataclass
+class S3FilesInFolderResponse:
+    s3_bucket_path_key: str
+    full_url: str
+    last_modified: str
 
 
 class S3Service:
@@ -72,3 +80,22 @@ class S3Service:
         )
         # The response contains the preSigned URL
         return response
+
+    def list_s3_files_in_folder(
+        self, user_id: str, bucket_name: str
+    ) -> List[S3FilesInFolderResponse]:
+        """
+        This function will list down all files in a folder from S3 bucket
+        :return: None
+        """
+        prefix = f"user/{user_id}"
+        response = self.s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+        files = response.get("Contents")
+        return [
+            S3FilesInFolderResponse(
+                file["Key"],
+                self.create_pre_signed_url(bucket_name, file["Key"]),
+                str(file["LastModified"]),
+            )
+            for file in files
+        ]

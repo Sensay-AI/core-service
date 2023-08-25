@@ -14,7 +14,10 @@ from app.models.schemas.vocabulary import (
     VocabularyPromptCreate,
     VocabularyQuestionCreate,
 )
-from app.repositories.vocabulary_repository import VocabularyRepository
+from app.repositories.vocabulary_repository import (
+    CreateWithCategoryResponse,
+    VocabularyRepository,
+)
 from app.services.base_service import BaseService
 
 
@@ -83,7 +86,7 @@ class VocabularyService(BaseService):
         ):
             raw_questions += text
             yield text
-
+        yield "\n \n \n"
         try:
             self.logger.debug("Streaming process done")
             raw_questions = raw_questions.replace("\\n", " ")
@@ -98,19 +101,21 @@ class VocabularyService(BaseService):
                 questions,
             )
             learning_obj.level = user_input.level
-            self._add_lesson_to_database(learning_obj, user_id)
-            questions["lesson_id"] = -1
-            # Yield with full data
-            yield questions.__str__()
+            category = self._add_lesson_to_database(learning_obj, user_id)
+            # Yield category_id
+            yield {
+                "category_id": category.category_id,
+                "learning_language": category.learning_language,
+            }.__str__()
         except JSONDecodeError as e:
             self.logger.error(e.__str__())
             raise PromptParserException()
 
     def _add_lesson_to_database(
         self, learning_obj: VocabularyPromptCreate, user_id: str
-    ) -> None:
+    ) -> CreateWithCategoryResponse:
         self.logger.debug("Add lesson to database")
-        self.voca_repository.create_with_category(learning_obj, user_id)
+        return self.voca_repository.create_with_category(learning_obj, user_id)
 
     def get_history_lessons(
         self,

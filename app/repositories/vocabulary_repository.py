@@ -29,6 +29,12 @@ class QuestionWithAnswers:
     answers: List[VocabularyAnswer]
 
 
+@dataclass
+class CreateWithCategoryResponse:
+    category_id: int
+    learning_language: str
+
+
 def check_language(db: Session, language_name: str) -> int:
     language: Optional[Language] = (
         db.query(Language)
@@ -89,7 +95,7 @@ class VocabularyRepository(
 ):
     def create_with_category(
         self, prompt_create: VocabularyPromptCreate, user_id: str
-    ) -> None:
+    ) -> CreateWithCategoryResponse:
         self.logger.debug("Create voca lesson with category")
         with self.session_factory() as session:
             stmt = (
@@ -137,6 +143,10 @@ class VocabularyRepository(
             session.add_all(questions_with_answers.questions)
             session.add_all(questions_with_answers.answers)
             session.commit()
+
+            return CreateWithCategoryResponse(
+                insert_id, prompt_create.learning_language
+            )
 
     def get_history_questions(
         self,
