@@ -1,7 +1,7 @@
 import logging
 
 from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from app.container.containers import Container
 from app.models.db.users import UserInfo
@@ -24,7 +24,9 @@ async def get_user_profile(
     try:
         return user_service.get_user_by_id(auth.id)
     except NotFoundError:
-        return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        return Response(
+            "User not found or maybe new user", status_code=status.HTTP_404_NOT_FOUND
+        )
 
 
 @router.post("/create")
