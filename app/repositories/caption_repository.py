@@ -7,6 +7,8 @@ from app.repositories.vocabulary_repository import check_language
 
 
 class CaptionRepository(BaseRepository[ImageCaption, ImageCaptionCreate, Any]):
+    # TODO: Refactor this code like Minh comment in the discussion here
+    #  https://github.com/Sensay-AI/core-service/pull/9#discussion_r1306123877
     def add_image_caption(
         self, user_id: str, image_caption: ImageCaptionCreate
     ) -> None:
@@ -23,7 +25,6 @@ class CaptionRepository(BaseRepository[ImageCaption, ImageCaptionCreate, Any]):
                 caption=image_caption.caption,
                 language_id=primary_language_id,
             )
-
             translated_image_caption = ImageCaptionTranslation(
                 translated_language_id=learning_language_id,
                 translated_caption=image_caption.translation,
