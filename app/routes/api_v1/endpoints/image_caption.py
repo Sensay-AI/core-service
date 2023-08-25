@@ -6,9 +6,9 @@ from fastapi.responses import StreamingResponse
 
 from app.container.containers import Container
 from app.infrastructure.aws.s3 import S3Service
+from app.models.schemas.image_caption import ImageCaptionRequest
 from app.models.schemas.users import Auth0User
 from app.routes.api_v1.endpoints.auth import check_user
-from app.models.schemas.image_caption import ImageCaptionRequest
 from app.services.caption_service import CaptionService
 
 router = APIRouter()
