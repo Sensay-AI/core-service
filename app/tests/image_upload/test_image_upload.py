@@ -40,7 +40,7 @@ def test_upload_image(client):
         image_bytes = image_file.read()
         image_file = ("test_image.png", image_bytes, "image/png")
         response = client.post(
-            "/api/v1/image",
+            "/api/v1/image/upload",
             files={"image_file": image_file},
             headers={
                 "Accept": APPLICATION_JSON,

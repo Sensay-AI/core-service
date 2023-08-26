@@ -12,15 +12,17 @@ from replicate import Client
 
 from app.infrastructure.auth0.auth0 import Auth0Service
 from app.infrastructure.aws.s3 import S3Service
-from app.infrastructure.captions.replicate_caption import CaptionGenerator
 from app.infrastructure.db.database import Database
-from app.infrastructure.llm.caption import ChatGPTCaption
+from app.infrastructure.llm.caption import ChatGPTCaptionGenerator
 from app.infrastructure.llm.vocabulary import ChatGPTVocabularyGenerator
-from app.models.db.image_caption import ImageCaption
+from app.infrastructure.replicate.caption import CaptionGenerator
 from app.models.db.language import Language
 from app.models.db.vocabulary import Category, VocabularyPrompt
 from app.repositories.base_repository import BaseRepository
-from app.repositories.caption_repository import CaptionRepository
+from app.repositories.caption_repository import (
+    CaptionRepository,
+    TranslatedCaptionRepository,
+)
 from app.repositories.user_repository import UserRepository
 from app.repositories.vocabulary_repository import VocabularyRepository
 from app.services.base_service import BaseService
@@ -32,8 +34,7 @@ from app.services.vocabulary_service import VocabularyService
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
         modules=[
-            "app.routes.api_v1.endpoints.image_upload",
-            "app.routes.api_v1.endpoints.image_caption",
+            "app.routes.api_v1.endpoints.image",
             "app.routes.api_v1.endpoints.user",
             "app.routes.api_v1.endpoints.auth",
             "app.routes.api_v1.endpoints.language",
@@ -110,12 +111,12 @@ class Container(containers.DeclarativeContainer):
     )
 
     caption_client: Resource[Client] = providers.Resource(
-        Client, api_token=config.infrastructures.caption.replicate.access_token
+        Client, api_token=config.infrastructures.replicate.access_token
     )
 
     caption_generator = providers.Singleton(
         CaptionGenerator,
-        model_id=config.infrastructures.caption.replicate.caption_model.model_id,
+        model_id=config.infrastructures.replicate.caption_model.model_id,
         caption_client=caption_client,
     )
     open_ai: OpenAI = providers.Singleton(
@@ -125,21 +126,18 @@ class Container(containers.DeclarativeContainer):
         temperature=config.infrastructures.open_ai.temperature,
     )
 
-    image_caption_repository = providers.Factory(
-        CaptionRepository, model=ImageCaption, session_factory=db.provided.session
-    )
-
-    chatgpt_caption = providers.Singleton(ChatGPTCaption, model=open_ai)
-
-    caption_service = providers.Factory(
-        CaptionService,
-        image_caption_repository=image_caption_repository,
-        caption_generator=caption_generator,
-        chatgpt_caption=chatgpt_caption,
-    )
+    chatgpt_caption = providers.Singleton(ChatGPTCaptionGenerator, model=open_ai)
 
     chatGPT_vocabulary_generator = providers.Singleton(
         ChatGPTVocabularyGenerator, model=open_ai
+    )
+
+    primary_caption_repository = providers.Factory(
+        CaptionRepository, session_factory=db.provided.session
+    )
+
+    learning_caption_repository = providers.Factory(
+        TranslatedCaptionRepository, session_factory=db.provided.session
     )
 
     language_repository = providers.Factory(
@@ -160,6 +158,14 @@ class Container(containers.DeclarativeContainer):
         VocabularyService,
         voca_generator=chatGPT_vocabulary_generator,
         voca_repository=vocabulary_repository,
+    )
+
+    caption_service = providers.Factory(
+        CaptionService,
+        learning_caption_repository=learning_caption_repository,
+        primary_caption_repository=primary_caption_repository,
+        caption_generator=caption_generator,
+        chatgpt_caption=chatgpt_caption,
     )
 
     category_service = providers.Factory(BaseService, repository=category_repository)
