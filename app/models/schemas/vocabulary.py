@@ -7,7 +7,7 @@ class GetVocabularyQuestions(BaseModel):
     translated_language: str
     learning_language: str
     num_questions: int = 5
-    num_answers: int = 4
+    num_answers: int = 3
 
 
 class GetVocabularyHistoryQuestion(BaseModel):

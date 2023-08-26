@@ -28,7 +28,7 @@ from app.services.vocabulary_service import VocabularyService
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
         modules=[
-            # "app.routes.api_v1.endpoints.image_upload",
+            "app.routes.api_v1.endpoints.image_upload",
             "app.routes.api_v1.endpoints.user",
             "app.routes.api_v1.endpoints.auth",
             "app.routes.api_v1.endpoints.language",

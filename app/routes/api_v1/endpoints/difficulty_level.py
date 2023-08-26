@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get("/")
 @inject
-async def get_current_difficulty_lesson_level(
+async def get_all_difficulty_lesson_level(
     *,
     page_params: PageParams = Depends(),
     difficulty_levels: BaseService = Depends(
