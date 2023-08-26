@@ -78,6 +78,41 @@ to integration level test (put some part of code together).
 So please do test on the code you wrote, integration test is a must for delivering an API.
 For other part external part of the system like Auth0, DB, AWS,... you don't have to test that.
 
+## DB Change Management 
+
+Currently, sqlalchemy doesn't support update when model changing (it can only create new table).
+The solution is to use Alembic to do that.
+Please refer here on some tutorial: [Alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html)
+
+So if you have some updates to the db models, please help update Alembic folder as well,
+Here are some steps to follow when update db:
+1. Config DB credentials:
+```bash
+   export DB_URL <something>
+```
+Alternative way is changing sqlalchemy.url the [alembic.ini](./alembic.ini) 
+but please do it only in localhost, don't commit that
+
+2. Create a Migration Script:
+```bash
+   alembic revision -m "create account table"
+```
+this command will create a file in alembic/development, if you want to use production env:
+```bash
+   alembic --name production revision -m "create account table"
+```
+
+3. Update your Migration Script
+4. Run to apply changes:
+```bash
+   alembic upgrade head
+```
+or
+```bash
+   alembic --name production upgrade head
+```
+
+
 
 ## Configuration
 
