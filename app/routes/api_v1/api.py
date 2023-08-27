@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from app.routes.api_v1.endpoints import (
     auth,
     difficulty_level,
-    image_upload,
     image,
     language,
     user,

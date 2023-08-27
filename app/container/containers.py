@@ -16,8 +16,8 @@ from app.infrastructure.aws.s3 import S3Service
 from app.infrastructure.db.database import Database
 from app.infrastructure.llm.caption import ChatGPTCaptionGenerator
 from app.infrastructure.llm.vocabulary import ChatGPTVocabularyGenerator
-from app.models.db.difficulty_levels import DifficultyLevels
 from app.infrastructure.replicate.caption import CaptionGenerator
+from app.models.db.difficulty_levels import DifficultyLevels
 from app.models.db.language import Language
 from app.models.db.vocabulary import Category, VocabularyPrompt
 from app.repositories.base_repository import BaseRepository
