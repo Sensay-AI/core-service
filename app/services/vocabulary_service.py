@@ -87,7 +87,7 @@ class VocabularyService(BaseService):
             learning_language=user_input.learning_language,
             num_questions=user_input.num_questions,
             num_answers=user_input.num_answers,
-            level=user_input.level,
+            level=user_input.level_type,
         ):
             raw_questions += text
             yield text
@@ -104,7 +104,7 @@ class VocabularyService(BaseService):
                 user_input.learning_language,
                 user_input.translated_language,
                 questions,
-                user_input.level,
+                user_input.level_type,
             )
             category = self._add_lesson_to_database(learning_obj, user_id)
             # Yield category_id

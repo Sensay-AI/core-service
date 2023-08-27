@@ -7,6 +7,7 @@ from app.models.common.pagination import PageParams
 from app.models.db.vocabulary import Category
 from app.models.schemas.users import Auth0User
 from app.models.schemas.vocabulary import (
+    DIFFICULT_LEVELS,
     GetVocabularyHistoryQuestion,
     GetVocabularyQuestions,
 )
@@ -15,6 +16,20 @@ from app.services.base_service import BaseService
 from app.services.vocabulary_service import PromptParserException, VocabularyService
 
 router = APIRouter()
+
+
+def get_backward_compatibility(
+    user_input: GetVocabularyQuestions,
+) -> GetVocabularyQuestions:
+    if user_input.level:
+        user_input_new = user_input.copy()
+        user_input_new.level_type = (
+            DIFFICULT_LEVELS[user_input.level]
+            if (DIFFICULT_LEVELS[user_input.level])
+            else DIFFICULT_LEVELS[1]
+        )
+        return user_input_new
+    return user_input
 
 
 @router.post("/question")
@@ -28,9 +43,15 @@ async def create_vocabulary_question(
     auth: Auth0User = Depends(check_user),
 ) -> object:
     try:
+        if user_input.level_type not in DIFFICULT_LEVELS.values():
+            return HTTPException(
+                status_code=10003,
+                detail="Invalid level type, only accept value: <'EASY,'INTERMEDIATE','ADVANCED'>",
+            )
+
         return StreamingResponse(
             vocabulary_service.get_new_vocabulary_lessons(
-                user_id=auth.id, user_input=user_input
+                user_id=auth.id, user_input=get_backward_compatibility(user_input)
             ),
             media_type="text/plain",
         )
