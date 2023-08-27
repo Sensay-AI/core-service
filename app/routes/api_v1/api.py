@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.routes.api_v1.endpoints import (
     auth,
+    difficulty_level,
     image,
     language,
     user,
@@ -16,3 +17,8 @@ router.include_router(
     vocabulary.router, prefix="/lesson/vocabulary", tags=["vocabulary"]
 )
 router.include_router(language.router, prefix="/language", tags=["language"])
+router.include_router(
+    difficulty_level.router,
+    prefix="/lesson/difficulty_level",
+    tags=["difficulty_level"],
+)

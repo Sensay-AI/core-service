@@ -1,6 +1,7 @@
 """Containers module."""
 
 import logging.config
+from typing import Any
 
 import boto3
 import sentry_sdk
@@ -16,6 +17,7 @@ from app.infrastructure.db.database import Database
 from app.infrastructure.llm.caption import ChatGPTCaptionGenerator
 from app.infrastructure.llm.vocabulary import ChatGPTVocabularyGenerator
 from app.infrastructure.replicate.caption import CaptionGenerator
+from app.models.db.difficulty_levels import DifficultyLevels
 from app.models.db.language import Language
 from app.models.db.vocabulary import Category, VocabularyPrompt
 from app.repositories.base_repository import BaseRepository
@@ -39,6 +41,7 @@ class Container(containers.DeclarativeContainer):
             "app.routes.api_v1.endpoints.auth",
             "app.routes.api_v1.endpoints.language",
             "app.routes.api_v1.endpoints.vocabulary",
+            "app.routes.api_v1.endpoints.difficulty_level",
         ]
     )
 
@@ -145,7 +148,15 @@ class Container(containers.DeclarativeContainer):
     )
 
     category_repository = providers.Factory(
-        BaseRepository, model=Category, session_factory=db.provided.session
+        BaseRepository[Category, Any, Any],
+        model=Category,
+        session_factory=db.provided.session,
+    )
+
+    difficulty_levels_repository = providers.Factory(
+        BaseRepository[DifficultyLevels, Any, Any],
+        model=DifficultyLevels,
+        session_factory=db.provided.session,
     )
 
     vocabulary_repository = providers.Factory(
@@ -171,3 +182,7 @@ class Container(containers.DeclarativeContainer):
     category_service = providers.Factory(BaseService, repository=category_repository)
 
     language_service = providers.Factory(BaseService, repository=language_repository)
+
+    difficulty_levels_service = providers.Factory(
+        BaseService, repository=difficulty_levels_repository
+    )

@@ -22,7 +22,11 @@ from app.services.base_service import BaseService
 
 
 def parse_json_prompt(
-    category: str, learning_language: str, translated_language: str, data: dict
+    category: str,
+    learning_language: str,
+    translated_language: str,
+    data: dict,
+    level: str,
 ) -> VocabularyPromptCreate:
     questions = []
     data_learning = data[learning_language]
@@ -58,6 +62,7 @@ def parse_json_prompt(
         learning_language=learning_language,
         translated_language=translated_language,
         translation=data_translated["lesson"],
+        difficulty_level=level,
     )
 
 
@@ -82,7 +87,7 @@ class VocabularyService(BaseService):
             learning_language=user_input.learning_language,
             num_questions=user_input.num_questions,
             num_answers=user_input.num_answers,
-            level=user_input.level,
+            level=user_input.level_type,
         ):
             raw_questions += text
             yield text
@@ -99,8 +104,8 @@ class VocabularyService(BaseService):
                 user_input.learning_language,
                 user_input.translated_language,
                 questions,
+                user_input.level_type,
             )
-            learning_obj.level = user_input.level
             category = self._add_lesson_to_database(learning_obj, user_id)
             # Yield category_id
             yield {

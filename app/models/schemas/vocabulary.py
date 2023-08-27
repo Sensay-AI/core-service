@@ -1,13 +1,24 @@
+from typing import Optional
+
 from pydantic import BaseModel
+from pydantic.fields import Field
+
+DIFFICULT_LEVELS = {1: "EASY", 2: "INTERMEDIATE", 3: "ADVANCED"}
 
 
 class GetVocabularyQuestions(BaseModel):
     category: str
-    level: int
+    level: Optional[int] = Field(
+        None, description="DEPRECATED: Use `level_type` instead of this"
+    )
+    level_type: str = Field(
+        DIFFICULT_LEVELS[1],
+        description="Difficult level of the lesson, value: <'EASY','INTERMEDIATE','ADVANCED'>",
+    )
     translated_language: str
     learning_language: str
     num_questions: int = 5
-    num_answers: int = 4
+    num_answers: int = 3
 
 
 class GetVocabularyHistoryQuestion(BaseModel):
@@ -34,4 +45,4 @@ class VocabularyPromptCreate(BaseModel):
     learning_language: str
     translated_language: str
     translation: str
-    level: int = 1
+    difficulty_level: str

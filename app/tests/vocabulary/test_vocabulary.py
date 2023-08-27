@@ -26,6 +26,7 @@ LEARNING_LANGUAGE = "english"
 TRANSLATED_LANGUAGE = "vietnamese"
 APPLICATION_JSON = "application/json"
 CATEGORY = "mock_category"
+VOCABULARY_QUESTION_URL = "/api/v1/lesson/vocabulary/question"
 
 
 @pytest.fixture()
@@ -140,6 +141,7 @@ def mock_lesson_object() -> VocabularyPromptCreate:
         learning_language=LEARNING_LANGUAGE,
         translated_language=TRANSLATED_LANGUAGE,
         translation="prompt",
+        difficulty_level="EASY",
     )
 
 
@@ -162,9 +164,27 @@ def test_func_generate_vocabulary_questions(client):
         "num_answers": 1,
     }
     response = client.post(
-        "/api/v1/lesson/vocabulary/question", headers=get_http_header(), json=payload
+        VOCABULARY_QUESTION_URL, headers=get_http_header(), json=payload
     )
     assert response.status_code == 200
+
+
+def test_func_generate_vocabulary_questions_invalid_level_type(client):
+    auth_service_mock = mock_user()
+    app.container.auth.override(auth_service_mock)
+    payload = {
+        "category": "football",
+        "translated_language": "english",
+        "learning_language": "vietnamese",
+        "level_type": "EZ",
+        "num_questions": 1,
+        "num_answers": 1,
+    }
+    response = client.post(
+        VOCABULARY_QUESTION_URL, headers=get_http_header(), json=payload
+    )
+    assert response.status_code == 200
+    assert response.json()["status_code"] == 10003
 
 
 def test_prompt_parse_failed(client):
@@ -185,7 +205,7 @@ def test_prompt_parse_failed(client):
     }
     with pytest.raises(PromptParserException) as e:
         client.post(
-            "/api/v1/lesson/vocabulary/question",
+            VOCABULARY_QUESTION_URL,
             headers=get_http_header(),
             json=payload,
         )
@@ -194,7 +214,7 @@ def test_prompt_parse_failed(client):
 
 def test_parse_json_prompt():
     input_obj = parse_json_prompt(
-        CATEGORY, LEARNING_LANGUAGE, TRANSLATED_LANGUAGE, mock_lesson_dict()
+        CATEGORY, LEARNING_LANGUAGE, TRANSLATED_LANGUAGE, mock_lesson_dict(), "EASY"
     )
     output_obj = mock_lesson_object()
 

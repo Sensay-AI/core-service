@@ -36,13 +36,17 @@ class VocabularyPrompt(Base):
     __tablename__ = "vocabulary_prompts"
     id = Column(Integer, primary_key=True)
     prompt = Column(String, nullable=False)
-    level = Column(Integer, default=1)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now())
     is_valid = Column(Boolean, default=True)
 
     category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
     language_id = Column(Integer, ForeignKey(FOREIGN_LANGUAGE_ID), nullable=False)
+    difficulty_level_id = Column(
+        Integer, ForeignKey("difficulty_levels.id"), nullable=False
+    )
+
+    difficulty_level = relationship("DifficultyLevels")
     language = relationship("Language")
     questions = relationship("VocabularyQuestion", back_populates="prompt")
     category = relationship("Category", back_populates="prompts")
