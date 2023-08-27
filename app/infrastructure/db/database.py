@@ -14,6 +14,9 @@ def dump(sql, *multiparams, **params):  # type: ignore
 
 
 class Database:
+    # TODO: naming of the package in this folder must be more consistent
+    #  https://github.com/Sensay-AI/core-service/pull/9#discussion_r1306129822
+
     def __init__(self, db_url: str) -> None:
         self.logger = logging.getLogger(
             f"{__name__}.{self.__class__.__name__}",

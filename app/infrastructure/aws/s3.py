@@ -2,7 +2,7 @@ import hashlib
 import logging
 from dataclasses import dataclass
 from io import BytesIO
-from typing import List
+from typing import Any, List
 
 from boto3_type_annotations.s3 import Client
 from botocore.exceptions import ClientError
@@ -63,6 +63,11 @@ class S3Service:
             upload_path, self.create_pre_signed_url(bucket_name, upload_path)
         )
 
+    def get_file(self, file_path: str, bucket_name: str) -> Any:
+        obj = self.s3_client.get_object(Bucket=bucket_name, Key=file_path)
+        obj = obj["Body"].read()
+        return obj
+
     def create_pre_signed_url(
         self, bucket_name: str, object_name: str, expiration: int = 3600
     ) -> str:
@@ -91,11 +96,15 @@ class S3Service:
         prefix = f"user/{user_id}"
         response = self.s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
         files = response.get("Contents")
-        return [
-            S3FilesInFolderResponse(
-                file["Key"],
-                self.create_pre_signed_url(bucket_name, file["Key"]),
-                str(file["LastModified"]),
-            )
-            for file in files
-        ]
+        return (
+            [
+                S3FilesInFolderResponse(
+                    file["Key"],
+                    self.create_pre_signed_url(bucket_name, file["Key"]),
+                    str(file["LastModified"]),
+                )
+                for file in files
+            ]
+            if files
+            else []
+        )

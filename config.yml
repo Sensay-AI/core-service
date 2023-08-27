@@ -19,6 +19,10 @@ infrastructures:
       production: "sensayai-images"
       development: "sensayai-images-dev"
       local: "sensayai-images-local"
+  replicate:
+    access_token: ${REPLICATE_TOKEN}
+    caption_model:
+      model_id: ${REPLICATE_MODEL:"salesforce/blip:2e1dddc8621f72155f24cf2e0adbde548458d3cab9f00c0139eea840d0ac4746"}
   db:
     url: ${DB_URL}
   auth0:
