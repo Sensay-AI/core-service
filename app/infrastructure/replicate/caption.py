@@ -4,9 +4,6 @@ from replicate import Client
 
 
 class CaptionGenerator:
-    # TODO: naming of the package in this folder must be more consistent
-    #  https://github.com/Sensay-AI/core-service/pull/9#discussion_r1306129822
-
     def __init__(self, caption_client: Client, model_id: str) -> None:
         self.caption_client = caption_client
         self.model_id = model_id

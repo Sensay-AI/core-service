@@ -96,11 +96,15 @@ class S3Service:
         prefix = f"user/{user_id}"
         response = self.s3_client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
         files = response.get("Contents")
-        return [
-            S3FilesInFolderResponse(
-                file["Key"],
-                self.create_pre_signed_url(bucket_name, file["Key"]),
-                str(file["LastModified"]),
-            )
-            for file in files
-        ]
+        return (
+            [
+                S3FilesInFolderResponse(
+                    file["Key"],
+                    self.create_pre_signed_url(bucket_name, file["Key"]),
+                    str(file["LastModified"]),
+                )
+                for file in files
+            ]
+            if files
+            else []
+        )
