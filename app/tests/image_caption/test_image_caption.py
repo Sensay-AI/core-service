@@ -87,7 +87,7 @@ def test_generate_caption(client):
     }
 
     response = client.post(
-        "/api/v1/image/s3_bucket/sensayai-images/caption",
+        "/api/v1/image/caption",
         json=payload,
         headers={
             "Accept": APPLICATION_JSON,
@@ -132,7 +132,7 @@ def test_generate_caption_fail(client):
     }
     with pytest.raises(JSONDecodeError) as e:
         client.post(
-            "/api/v1/image/s3_bucket/sensayai-images/caption",
+            "/api/v1/image/caption",
             json=payload,
             headers={
                 "Accept": APPLICATION_JSON,
