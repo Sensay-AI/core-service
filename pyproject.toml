@@ -34,7 +34,7 @@ disallow_untyped_defs = true
 no_implicit_optional = true
 show_error_codes = true
 pretty = true
-exclude = ['build','venv','.venv']
+exclude = ['build','venv','.venv','alembic/production/env.py']
 
 [[tool.mypy.overrides]]
 module = "app.tests.*"
