@@ -93,6 +93,8 @@ def parse_question_answers(
 class VocabularyRepository(
     BaseRepository[VocabularyPrompt, VocabularyPromptCreate, Any]
 ):
+    # TODO: Refactor this code like Minh comment in the discussion here
+    #  https://github.com/Sensay-AI/core-service/pull/9#discussion_r1306123877
     def create_with_category(
         self, prompt_create: VocabularyPromptCreate, user_id: str
     ) -> CreateWithCategoryResponse:
