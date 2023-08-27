@@ -33,7 +33,7 @@ def create_app() -> FastAPI:
     container.db()
     container.auth()
     container.sentry_sdk()
-    container.db().create_database()
+    # db.create_database()
     container.init_resources()
 
     fast_api_app = FastAPI()
