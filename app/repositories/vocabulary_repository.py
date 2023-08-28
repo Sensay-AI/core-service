@@ -43,10 +43,7 @@ def check_difficulty_lesson(db: Session, difficult_name: str) -> int:
         .first()
     )
     if not difficult_level:
-        difficult_level = DifficultyLevels(name=difficult_name.upper())
-        db.add(difficult_level)
-        db.commit()
-        db.refresh(difficult_level)
+        raise InvalidLessonLevel(difficult_name)
     return difficult_level.id
 
 
@@ -58,10 +55,7 @@ def check_language(db: Session, language_name: str) -> int:
     )
 
     if not language:
-        language = Language(language_name=language_name.upper())
-        db.add(language)
-        db.commit()
-        db.refresh(language)
+        raise InvalidLanguage(language_name)
     return language.id
 
 
@@ -207,3 +201,13 @@ class VocabularyRepository(
                 .order_by(VocabularyPrompt.created_at.desc())
             )
             return paginate(page, size, query)
+
+
+class InvalidLanguage(Exception):
+    def __init__(self, language: str):
+        super().__init__(f"Invalid language name: {language} !!!")
+
+
+class InvalidLessonLevel(Exception):
+    def __init__(self, language: str):
+        super().__init__(f"Invalid lesson level: {language} !!!")

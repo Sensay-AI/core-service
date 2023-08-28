@@ -33,7 +33,9 @@ def create_app() -> FastAPI:
     container.db()
     container.auth()
     container.sentry_sdk()
-    # db.create_database()
+    # db.create_all() will not create database's table if DB already created.
+    # So you don't have to comment on your code.
+    container.db().create_database()
     container.init_resources()
 
     fast_api_app = FastAPI()
