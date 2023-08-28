@@ -46,5 +46,6 @@ class CaptionService:
         )
         self.learning_caption_repository.add_translated_caption(
             learning_caption=caption_data[caption_input["learning_language"]],
+            learning_language=caption_input["learning_language"],
             image_caption_object=caption_insert_object,
         )

@@ -44,10 +44,13 @@ class TranslatedCaptionRepository:
         self.session_factory = session_factory
 
     def add_translated_caption(
-        self, learning_caption: str, image_caption_object: ImageCaptionPrimaryLanguage
+        self,
+        learning_caption: str,
+        learning_language: str,
+        image_caption_object: ImageCaptionPrimaryLanguage,
     ) -> ImageCaptionLearningLanguage:
         with self.session_factory() as session:
-            learning_language_id = check_language(session, learning_caption)
+            learning_language_id = check_language(session, learning_language)
             translated_image_caption = ImageCaptionLearningLanguage(
                 learning_language_id=learning_language_id,
                 learning_language_caption=learning_caption,
