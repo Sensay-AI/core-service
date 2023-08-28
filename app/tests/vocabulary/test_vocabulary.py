@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 from fastapi.testclient import TestClient
-from langchain import OpenAI
+from langchain.chat_models import ChatOpenAI
 
 from app.main import app
 from app.models.db.vocabulary import Category
@@ -149,7 +149,7 @@ def test_func_generate_vocabulary_questions(client):
     auth_service_mock = mock_user()
     voca_repo_mock = mock.Mock(spec=VocabularyRepository)
 
-    open_ai_mock = mock.Mock(spec=OpenAI)
+    open_ai_mock = mock.Mock(spec=ChatOpenAI)
     open_ai_mock.stream.return_value = mock_chat_gpt_response()
 
     app.container.auth.override(auth_service_mock)
@@ -190,7 +190,7 @@ def test_func_generate_vocabulary_questions_invalid_level_type(client):
 def test_prompt_parse_failed(client):
     auth_service_mock = mock_user()
     voca_repo_mock = mock.Mock(spec=VocabularyRepository)
-    open_ai_mock = mock.Mock(spec=OpenAI)
+    open_ai_mock = mock.Mock(spec=ChatOpenAI)
     open_ai_mock.stream.return_value = mock_wrong_chat_gpt_response()
     app.container.auth.override(auth_service_mock)
     app.container.open_ai.override(open_ai_mock)

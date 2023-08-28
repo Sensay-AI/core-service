@@ -8,7 +8,7 @@ import sentry_sdk
 from botocore.client import BaseClient
 from dependency_injector import containers, providers
 from dependency_injector.providers import Resource
-from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from replicate import Client
 
 from app.infrastructure.auth0.auth0 import Auth0Service
@@ -122,10 +122,10 @@ class Container(containers.DeclarativeContainer):
         model_id=config.infrastructures.replicate.caption_model.model_id,
         caption_client=caption_client,
     )
-    open_ai: OpenAI = providers.Singleton(
-        OpenAI,
+    open_ai: ChatOpenAI = providers.Singleton(
+        ChatOpenAI,
+        model_name=config.infrastructures.open_ai.model_name,
         openai_api_key=config.infrastructures.open_ai.openai_api_key,
-        max_tokens=config.infrastructures.open_ai.max_tokens,
         temperature=config.infrastructures.open_ai.temperature,
     )
 

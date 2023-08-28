@@ -9,8 +9,8 @@ core:
 
 infrastructures:
   open_ai:
+    model_name: ${OPENAI_MODEL_NAME:"gpt-3.5-turbo"}
     openai_api_key: ${OPENAI_API_KEY}
-    max_tokens: ${OPENAI_MAX_TOKENS:"-1"}
     temperature: ${OPENAI_TEMPERATURE:"0.5"}
   aws:
     access_key_id: ${AWS_ACCESS_KEY_ID}

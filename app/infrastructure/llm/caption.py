@@ -1,7 +1,9 @@
 import logging
 from typing import Generator
 
-from langchain import OpenAI, PromptTemplate
+from langchain import PromptTemplate
+from langchain.chat_models import ChatOpenAI
+from langchain.schema.messages import BaseMessageChunk
 
 
 class ChatGPTCaptionGenerator:
@@ -18,7 +20,7 @@ class ChatGPTCaptionGenerator:
         }
     """
 
-    def __init__(self, model: OpenAI):
+    def __init__(self, model: ChatOpenAI):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.model = model
 
@@ -35,4 +37,7 @@ class ChatGPTCaptionGenerator:
             description=caption,
         )
         for response in self.model.stream(prompt):
-            yield response
+            if isinstance(response, BaseMessageChunk):
+                yield response.dict()["content"]
+            elif isinstance(response, str):
+                yield response
