@@ -1,7 +1,7 @@
 from contextlib import AbstractContextManager
-from typing import Callable
+from typing import Callable, List
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.db.image_caption import (
     ImageCaptionLearningLanguage,
@@ -34,6 +34,24 @@ class CaptionRepository:
             session.add(img_caption)
             session.commit()
             return img_caption
+
+    def get_caption(self, user_id: str) -> List[ImageCaptionPrimaryLanguage]:
+        with self.session_factory() as session:
+            query = (
+                session.query(ImageCaptionPrimaryLanguage)
+                .join(ImageCaptionLearningLanguage)
+                .options(
+                    joinedload(ImageCaptionPrimaryLanguage.primary_language),
+                    joinedload(ImageCaptionPrimaryLanguage.learning_caption).joinedload(
+                        ImageCaptionLearningLanguage.learning_language
+                    ),
+                )
+                .filter(
+                    ImageCaptionPrimaryLanguage.user_id == user_id,
+                )
+                .order_by(ImageCaptionPrimaryLanguage.time_created.desc())
+            )
+            return query.all()
 
 
 class TranslatedCaptionRepository:

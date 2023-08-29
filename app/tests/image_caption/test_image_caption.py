@@ -5,7 +5,7 @@ from unittest import mock
 
 import pytest
 from fastapi.testclient import TestClient
-from langchain import OpenAI
+from langchain.chat_models import ChatOpenAI
 from replicate import Client
 
 from app.infrastructure.auth0.auth0 import Auth0Service
@@ -65,7 +65,7 @@ def test_generate_caption(client):
 
     primary_caption_repository_mock = mock.AsyncMock(spec=CaptionRepository)
     learning_caption_repository_mock = mock.AsyncMock(spec=TranslatedCaptionRepository)
-    open_ai_mock = mock.Mock(spec=OpenAI)
+    open_ai_mock = mock.Mock(spec=ChatOpenAI)
     open_ai_mock.stream.return_value = mock_chat_gpt_response()
 
     replicate_caption_mock = mock.Mock(spec=Client)
@@ -110,7 +110,7 @@ def test_generate_caption_fail(client):
 
     primary_caption_repository_mock = mock.AsyncMock(spec=CaptionRepository)
     learning_caption_repository_mock = mock.AsyncMock(spec=TranslatedCaptionRepository)
-    open_ai_mock = mock.Mock(spec=OpenAI)
+    open_ai_mock = mock.Mock(spec=ChatOpenAI)
     open_ai_mock.stream.return_value = mock_fail_response()
 
     replicate_caption_mock = mock.Mock(spec=Client)

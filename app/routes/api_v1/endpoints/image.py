@@ -105,3 +105,12 @@ async def generate_caption(
         ),
         media_type="text/plain",
     )
+
+
+@router.get("/caption")
+@inject
+async def get_caption_history(
+    auth: Auth0User = Depends(check_user),
+    caption_service: CaptionService = Depends(Provide[Container.caption_service]),
+) -> object:
+    return caption_service.list_caption_history(user_id=auth.id)

@@ -3,7 +3,9 @@ import textwrap
 from datetime import datetime
 from typing import Generator
 
-from langchain import OpenAI, PromptTemplate
+from langchain import PromptTemplate
+from langchain.chat_models import ChatOpenAI
+from langchain.schema.messages import BaseMessageChunk
 
 
 class ChatGPTVocabularyGenerator:
@@ -32,7 +34,7 @@ class ChatGPTVocabularyGenerator:
         '{"{{ learning_language }}": {{ format_output }}, "{{ primary_language }}": {{ format_output }}}'
     )
 
-    def __init__(self, model: OpenAI):
+    def __init__(self, model: ChatOpenAI):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.model = model
 
@@ -63,8 +65,11 @@ class ChatGPTVocabularyGenerator:
         prompt = textwrap.dedent(prompt)
         self.logger.debug(f"Request: {prompt}")
         for text in self.model.stream(prompt):
+            if isinstance(text, BaseMessageChunk):
+                yield text.dict()["content"]
+            elif isinstance(text, str):
+                yield text
             response += text
-            yield text
 
         self.logger.debug(f"Execution time: {datetime.now() - start}")
         self.logger.debug(f"Response: {response}")
