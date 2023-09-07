@@ -19,7 +19,7 @@ async def transcribe_audio(
     audio_file: UploadFile,
     google_recogniser: str = Depends(Provide[Container.google_recogniser]),
     gcp_credentials: str = Depends(Provide[Container.google_credential_file]),
-    # auth: Auth0User = Depends(check_user),
+    auth: Auth0User = Depends(check_user),
 ) -> Dict[str, str]:
     """Transcribe an audio file."""
 
