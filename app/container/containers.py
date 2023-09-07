@@ -102,6 +102,6 @@ class Container(containers.DeclarativeContainer):
         config.infrastructures.gcp.google_credential_file,
     )
 
-    google_project_id = providers.Resource(
-        config.infrastructures.gcp.google_project_id,
+    google_recogniser = providers.Resource(
+        config.infrastructures.gcp.google_recogniser,
     )

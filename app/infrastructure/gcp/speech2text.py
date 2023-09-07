@@ -8,7 +8,12 @@ from google.cloud.speech_v2.types import cloud_speech
 
 
 class Speech2Text:
-    def __init__(self, encoded_credentials: str):
+    def __init__(
+        self,
+        encoded_credentials: str,
+        recogniser_gcp: str,
+        config: cloud_speech.RecognitionConfig,
+    ):
         decoded_credentials = base64.b64decode(
             encoded_credentials.encode("utf-8")
         ).decode("utf-8")
@@ -22,29 +27,18 @@ class Speech2Text:
         # Initialize the SpeechClient using the temporary credentials file
         self.client = SpeechClient.from_service_account_file(temp_credentials_file)
 
+        # init config to inject
+        self.config = config
+        self.recogniser_gcp = recogniser_gcp
+
         # Clean up: Close the file descriptor and remove the temporary file
         os.close(temp_fd)
         os.remove(temp_credentials_file)
 
-    def transcribe_audio(
-        self, project_id: str, audio_content: bytes, language_code: str = "en-US"
-    ) -> str:
-        config = cloud_speech.RecognitionConfig(
-            auto_decoding_config=cloud_speech.AutoDetectDecodingConfig(),
-            language_codes=[language_code],
-            model="long",
-            # Reference: https://cloud.google.com/speech-to-text/v2/docs/transcription-model
-            features=cloud_speech.RecognitionFeatures(
-                enable_automatic_punctuation=True,
-            ),
-        )
-
-        recogniser_gcp = f"projects/{project_id}/locations/global/recognizers/_".format(
-            project_id=project_id
-        )
+    def transcribe_audio(self, audio_content: bytes) -> str:
         request = cloud_speech.RecognizeRequest(
-            recognizer=recogniser_gcp,
-            config=config,
+            recognizer=self.recogniser_gcp,
+            config=self.config,
             content=audio_content,
         )
 
