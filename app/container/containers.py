@@ -125,6 +125,7 @@ class Container(containers.DeclarativeContainer):
     open_ai: OpenAI = providers.Singleton(
         OpenAI,
         openai_api_key=config.infrastructures.open_ai.openai_api_key,
+        model_name="gpt-3.5-turbo-16k",
         max_tokens=config.infrastructures.open_ai.max_tokens,
         temperature=config.infrastructures.open_ai.temperature,
     )

@@ -10,8 +10,8 @@ core:
 infrastructures:
   open_ai:
     openai_api_key: ${OPENAI_API_KEY}
-    max_tokens: ${OPENAI_MAX_TOKENS:"-1"}
-    temperature: ${OPENAI_TEMPERATURE:"0.5"}
+    max_tokens: ${OPENAI_MAX_TOKENS:15000}
+    temperature: ${OPENAI_TEMPERATURE:0.6}
   aws:
     access_key_id: ${AWS_ACCESS_KEY_ID}
     secret_access_key: ${AWS_SECRET_ACCESS_KEY}
