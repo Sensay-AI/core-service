@@ -115,7 +115,7 @@ boto3-type-annotations-with-docs = "^0.3.1"
 dependency-injector = "^4.41.0"
 pyyaml = "^6.0.1"
 sentry-sdk = { version = "*", extras = ["fastapi"] }
-langchain = "^0.0.265"
+langchain = "^0.0.320"
 tiktoken = "^0.4.0"
 jinja2 = "^3.1.2"
 
